@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 try:
     from urllib2 import Request, urlopen
 except ImportError:
@@ -71,7 +73,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``address.get_city_ref(city=u'Здолбунів')``
+            ``address.get_city_ref(city='Здолбунів')``
         :param city:
             name of the required city
         :type city:
@@ -95,6 +97,9 @@ class Address(NovaPoshtaApi):
             dictionary with info about all cities
         :rtype:
             dict
+
+        >>> Address().get_cities() # doctest: +ELLIPSIS
+        {...}
         """
         req = self.send(method='getCities')
         return req
@@ -105,7 +110,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``address.get_city_by_name(city=u'Здолбунів')``
+            ``address.get_city_by_name(city='Здолбунів')``
         :param city:
             name of the desired city
         :type city:
@@ -114,6 +119,8 @@ class Address(NovaPoshtaApi):
             dictionary with info about city
         :rtype:
             dict
+        >>> Address().get_city_by_name(city='Здолбунів') # doctest: +ELLIPSIS
+        {...}
         """
         req = self.send(method='getCities', method_props={'FindByString': city})
         return req
@@ -126,7 +133,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``address.get_streets(city=u'Здолбунів')``
+            ``address.get_streets(city='Здолбунів')``
         :param city:
             name of the desired city
         :type city:
@@ -167,7 +174,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``print address.ex_get_street_by_name(city=u'Здолбунів', street=u'Незалежності')``
+            ``print address.ex_get_street_by_name(city='Здолбунів', street='Незалежності')``
         :param city:
             name of the target city
         :type city:
@@ -191,7 +198,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``address.get_street_by_name(city_ref='0006560c-4079-11de-b509-001d92f78698', street=u'Незалежності')``
+            ``address.get_street_by_name(city_ref='0006560c-4079-11de-b509-001d92f78698', street='Незалежності')``
         :param city_ref:
             ID of the target city
         :type city_ref:
@@ -216,7 +223,7 @@ class Address(NovaPoshtaApi):
 
         :example:
             ``address = Address()``
-            ``address.get_warehouses(city=u'Здолбунів')``
+            ``address.get_warehouses(city='Здолбунів')``
         :param city:
             name of the target city
         :type city:
@@ -286,15 +293,15 @@ class Address(NovaPoshtaApi):
         :example:
             ``address = Address()``
             ``address.save(cp_ref='5953fb16-08d8-11e4-8958-0025909b4e33',``
-            ``str_ref='d8364179-4149-11dd-9198-001d60451983', build_num=u'20',``
-            ``flat=u'10')``
+            ``str_ref='d8364179-4149-11dd-9198-001d60451983', build_num='20',``
+            ``flat='10')``
             or:
             ``address = Address()``
             ``data = {
             ``        cp_ref='5953fb16-08d8-11e4-8958-0025909b4e33',``
             ``        str_ref='d8364179-4149-11dd-9198-001d60451983',
-            ``        build_num=u'20',``
-            ``        flat=u'10'}``
+            ``        build_num='20',``
+            ``        flat='10'}``
             ``address.save(from_data=data)``
         :param from_data:
             dictionary with all required data, will be used instead of passing each keyword separately
@@ -438,7 +445,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.get_counterparties(name=u'Талісман', cp_type='Recipient')``
+            ``counterparty.get_counterparties(name='Талісман', cp_type='Recipient')``
         :param name:
             name of the desired counterparty
         :type name:
@@ -462,7 +469,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_ref(name=u'Талісман', cp_type='Recipient')``
+            ``counterparty.get_counterparty_ref(name='Талісман', cp_type='Recipient')``
         :param name:
             name of the desired counterparty
         :type name:
@@ -489,7 +496,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_by_edrpou(city=u'Здолбунів', code='12345678')``
+            ``counterparty.ex_get_counterparty_by_edrpou(city='Здолбунів', code='12345678')``
         :param city:
             name of the city of counterparty
         :type city:
@@ -514,7 +521,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_by_edrpou(city_ref=u'0006560c-4079-11de-b509-001d92f78698', code='12345678')``
+            ``counterparty.get_counterparty_by_edrpou(city_ref='0006560c-4079-11de-b509-001d92f78698', code='12345678')``
         :param city_ref:
             ID of the city of counterparty
         :type city_ref:
@@ -539,7 +546,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_addresses(u'Талісман', cp_type='Recipient')``
+            ``counterparty.ex_get_counterparty_addresses('Талісман', cp_type='Recipient')``
         :param name:
             name of the counterparty
         :type name:
@@ -562,7 +569,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_addresses(u'f70f1bee-55fd-11e5-8d8d-005056887b8d', cp_type='Recipient')``
+            ``counterparty.get_counterparty_addresses('f70f1bee-55fd-11e5-8d8d-005056887b8d', cp_type='Recipient')``
         :param cp_ref:
             ID of the counterparty
         :type cp_ref:
@@ -586,7 +593,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_contact_persons(u'Талісман', cp_type='Recipient')``
+            ``counterparty.ex_get_counterparty_contact_persons('Талісман', cp_type='Recipient')``
         :param name:
             name of the counterparty
         :type name:
@@ -608,7 +615,7 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_contact_persons(u'f70f1bee-55fd-11e5-8d8d-005056887b8d')``
+            ``counterparty.get_counterparty_contact_persons('f70f1bee-55fd-11e5-8d8d-005056887b8d')``
         :param cp_ref:
             name of the counterparty
         :type cp_ref:
@@ -634,8 +641,8 @@ class Counterparty(NovaPoshtaApi):
 
         :example:
             ``counterparty = Counterparty()``
-            ``counterparty.save(city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name=u'Фелікс',``
-            ``mid_name=u'Едуардович', last_name=u'Ковальчук', phone='0937979489',``
+            ``counterparty.save(city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name='Фелікс',``
+            ``mid_name='Едуардович', last_name='Ковальчук', phone='0937979489',``
             ``email='myemail@my.com', cp_type='PrivatePerson', cp_prop='Recipient')``
             or:
             ``counterparty = Counterparty()``
@@ -725,8 +732,8 @@ class Counterparty(NovaPoshtaApi):
         :example:
             ``counterparty = Counterparty()``
             ``counterparty.update(ref='db5c88d7-391c-11dd-90d9-001a92567626',``
-            ``city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name=u'Фелікс',``
-            ``mid_name=u'Едуардович', last_name=u'Ковальчук', phone='0937979489',``
+            ``city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name='Фелікс',``
+            ``mid_name='Едуардович', last_name='Ковальчук', phone='0937979489',``
             ``email='myemail@my.com', cp_type='PrivatePerson', cp_prop='Recipient', own_form='')``
             or:
             ``counterparty = Counterparty()``
@@ -930,7 +937,7 @@ class Common(NovaPoshtaApi):
         In general, it is extended version of `get_cargo_description_list` with `FindByString` API's methods param.
         :example:
             ``common = Common()``
-            ``common.search_cargo_description_list(u'Абажур')``
+            ``common.search_cargo_description_list('Абажур')``
         :param keyword:
             keyword for searching
         :type keyword:
@@ -1026,7 +1033,7 @@ class Common(NovaPoshtaApi):
 
         :example:
         ``common = Common()``
-        ``common.ex_get_time_intervals(city=u'Рівне', datetime=u'2.10.2015')``
+        ``common.ex_get_time_intervals(city='Рівне', datetime='2.10.2015')``
         :param city:
             name of the recipient's city
         :param datetime:
@@ -1046,7 +1053,7 @@ class Common(NovaPoshtaApi):
 
         :example:
         ``common = Common()``
-        ``common.get_time_intervals(city_ref=u'udb5c896a-391c-11dd-90d9-001a92567626', datetime=u'2.10.2015')``
+        ``common.get_time_intervals(city_ref='udb5c896a-391c-11dd-90d9-001a92567626', datetime='2.10.2015')``
         :param city_ref:
             ID of the recipient's city
         :param datetime:
@@ -1112,11 +1119,11 @@ class Common(NovaPoshtaApi):
 
         :example:
             ``common = Common()``
-            ``common.get_document_status(state_id=u'1')
-            ``common.get_document_status(group_id=u'1')``
-            ``common.get_document_status(group_id=u'1')
-            ``common.get_document_status(state_name=u'Замовлення в обробці')
-            ``common.get_document_status(group_id=u'1', state_name=u'Замовлення в обробці')
+            ``common.get_document_status(state_id='1')
+            ``common.get_document_status(group_id='1')``
+            ``common.get_document_status(group_id='1')
+            ``common.get_document_status(state_name='Замовлення в обробці')
+            ``common.get_document_status(group_id='1', state_name='Замовлення в обробці')
 
         :param state_id:
             numeric ID of document status
@@ -1187,3 +1194,8 @@ class ContactPerson(NovaPoshtaApi):
 
 class InternetDocument(NovaPoshtaApi):
     pass
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
