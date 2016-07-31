@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+>>> Address().get_cities() # doctest: +ELLIPSIS
+{...}
+>>> Address().get_city_by_name(city='Здолбунів') # doctest: +ELLIPSIS
+{...}
+"""
 from __future__ import unicode_literals
 
 try:
@@ -97,9 +103,6 @@ class Address(NovaPoshtaApi):
             dictionary with info about all cities
         :rtype:
             dict
-
-        >>> Address().get_cities() # doctest: +ELLIPSIS
-        {...}
         """
         req = self.send(method='getCities')
         return req
@@ -119,8 +122,6 @@ class Address(NovaPoshtaApi):
             dictionary with info about city
         :rtype:
             dict
-        >>> Address().get_city_by_name(city='Здолбунів') # doctest: +ELLIPSIS
-        {...}
         """
         req = self.send(method='getCities', method_props={'FindByString': city})
         return req
