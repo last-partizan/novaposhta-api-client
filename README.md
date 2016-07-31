@@ -18,3 +18,10 @@ NOVAPOSHTA_API_SETTINGS = {
     'api_point': 'https://api.novaposhta.ua/v2.0/json/', # default, not required
 }
 ```
+
+
+## Testing
+
+Using doctest module
+
+python -m novaposhta.models
