@@ -2,7 +2,7 @@
 from urllib2 import Request, urlopen
 import json
 
-API_SETTINGS = {'api_key': '', 'api_point': ''}
+from .conf import API_SETTINGS
 
 
 class NovaPoshtaApi(object):
