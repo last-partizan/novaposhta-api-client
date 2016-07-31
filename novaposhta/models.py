@@ -55,8 +55,8 @@ class NovaPoshtaApi(object):
         self.query['calledMethod'] = method
         if method_props:
             self.query['methodProperties'] = self._clean_properties(method_props)
-        req = Request(self.api_point, json.dumps(self.query))
-        response = json.load(urlopen(req))
+        req = Request(self.api_point, json.dumps(self.query).encode('utf-8'))
+        response = json.loads(urlopen(req).read().decode('utf-8'))
         return response
 
 
