@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-from urllib2 import Request, urlopen
+try:
+    from urllib2 import Request, urlopen
+except ImportError:
+    #  python3
+    from urllib.request import Request, urlopen
 import json
 
 from .conf import API_SETTINGS
@@ -27,7 +31,7 @@ class NovaPoshtaApi(object):
 
     @staticmethod
     def _clean_properties(method_properties):
-        return dict((k, v) for k, v in method_properties.iteritems() if v)
+        return dict((k, v) for k, v in method_properties.items() if v)
 
     def send(self, method=None, method_props=None):
         """
