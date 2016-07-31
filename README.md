@@ -5,12 +5,12 @@ Python client for Nova Poshta company's API.
 
 ## Configuration
 
-### Environment variables
+#### Environment variables
 
 If not using django, set `NOVAPOSHTA_API_KEY` and `NOVAPOSHTA_API_POINT` (not required)
 
 
-### Django
+#### Django
 Add to `settings.py`:
 ```
 NOVAPOSHTA_API_SETTINGS = {
