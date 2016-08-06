@@ -1194,7 +1194,9 @@ class ContactPerson(NovaPoshtaApi):
 
 
 class InternetDocument(NovaPoshtaApi):
-    pass
+
+    def get_document_list(self, **kwargs):
+        return self.send(method='getDocumentList', method_props=kwargs)
 
 
 if __name__ == "__main__":
