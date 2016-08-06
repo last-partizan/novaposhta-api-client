@@ -4,6 +4,8 @@
 {...}
 >>> Address().get_city_by_name(city='Здолбунів') # doctest: +ELLIPSIS
 {...}
+>>> InternetDocument().get_document_list() # doctest: +ELLIPSIS
+{...}
 """
 from __future__ import unicode_literals
 
@@ -41,7 +43,7 @@ class NovaPoshtaApi(object):
     def _clean_properties(method_properties):
         return dict((k, v) for k, v in method_properties.items() if v)
 
-    def send(self, method=None, method_props=None):
+    def send(self, method=None, method_props=None, test_url=None):
         """
         Primary method for API requests and data fetching.
         It uses `urllib2` and `json` libs for requests to API through `HTTP` protocol.
@@ -63,9 +65,20 @@ class NovaPoshtaApi(object):
         self.query['calledMethod'] = method
         if method_props:
             self.query['methodProperties'] = self._clean_properties(method_props)
-        req = Request(self.api_point, json.dumps(self.query).encode('utf-8'))
+        req = Request(self._get_api_url(method, test_url), json.dumps(self.query).encode('utf-8'))
         response = json.loads(urlopen(req).read().decode('utf-8'))
         return response
+
+    def _get_api_url(self, method, test_url):
+        if 'testapi' in self.api_point:
+            if not test_url:
+                test_url = "{format}/{cls}/{method}/"
+            return self.api_point + test_url.format(
+                cls=self.__class__.__name__,
+                method=method,
+                format='json',
+            )
+        return self.api_point
 
 
 class Address(NovaPoshtaApi):
@@ -1196,7 +1209,8 @@ class ContactPerson(NovaPoshtaApi):
 class InternetDocument(NovaPoshtaApi):
 
     def get_document_list(self, **kwargs):
-        return self.send(method='getDocumentList', method_props=kwargs)
+        return self.send(method='getDocumentList', method_props=kwargs,
+                         test_url="en/{format}/{method}/")
 
 
 if __name__ == "__main__":

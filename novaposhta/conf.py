@@ -6,6 +6,7 @@ example,
 NOVAPOSHTA_API_SETTINGS = {
     'api_key': '12345', # your api key, required
     'api_point': 'https://api.novaposhta.ua/v2.0/json/', # default, not required
+    'api_point': 'https://testapi.novaposhta.ua/v2.0/', # test api
 }
 """
 DEFAULT_API_ENDPOINT = 'https://api.novaposhta.ua/v2.0/json/'
