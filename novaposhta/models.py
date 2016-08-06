@@ -8,6 +8,7 @@
 {...}
 """
 from __future__ import unicode_literals
+import logging
 
 try:
     from urllib2 import Request, urlopen
@@ -17,6 +18,9 @@ except ImportError:
 import json
 
 from .conf import API_SETTINGS
+from .api.exceptions import ApiError, AuthError
+
+logger = logging.getLogger(__name__)
 
 
 class NovaPoshtaApi(object):
@@ -66,8 +70,19 @@ class NovaPoshtaApi(object):
         if method_props:
             self.query['methodProperties'] = self._clean_properties(method_props)
         req = Request(self._get_api_url(method, test_url), json.dumps(self.query).encode('utf-8'))
-        response = json.loads(urlopen(req).read().decode('utf-8'))
-        return response
+        resp = json.loads(urlopen(req).read().decode('utf-8'))
+        if resp["warnings"]:
+            logger.warning(
+                "Api returned warning list:\n%s",
+                [" * %s" % s for s in resp["warnings"]]
+            )
+        if not resp["success"]:
+            if resp["errorCodes"] == ['20000200068']:
+                cls = AuthError
+            else:
+                cls = ApiError
+            raise cls(resp["errorCodes"], resp["errors"])
+        return resp["data"]
 
     def _get_api_url(self, method, test_url):
         if 'testapi' in self.api_point:
@@ -1211,6 +1226,10 @@ class InternetDocument(NovaPoshtaApi):
     def get_document_list(self, **kwargs):
         return self.send(method='getDocumentList', method_props=kwargs,
                          test_url="en/{format}/{method}/")
+
+    def save(self, **kwargs):
+        return self.send(method="save", method_props=kwargs,
+                         test_url="en/{method}/{format}/")
 
 
 if __name__ == "__main__":
