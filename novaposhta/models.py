@@ -1,19 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-import logging
-
-try:
-    from urllib2 import Request, urlopen
-except ImportError:
-    #  python3
-    from urllib.request import Request, urlopen
-
-from . import serializer
-from .conf import API_SETTINGS
-from .api.exceptions import ApiError, AuthError
-
-logger = logging.getLogger(__name__)
-
+# coding: utf-8
+from .api import queries
 
 class NovaPoshtaApi(object):
     """A base API class, that holds shared methods and settings for other models.
@@ -21,25 +7,6 @@ class NovaPoshtaApi(object):
     """
     # api path for testapi
     test_url = "{format}/{cls}/{method}/"
-
-    def __init__(self):
-        """
-        Creates basic configuration dictionary, used as API query template by models.
-        Settings can be set through `API_SETTINGS` variable.
-        """
-        self.query = {
-            'modelName': self.__class__.__name__,
-            'methodProperties': {},
-            'apiKey': API_SETTINGS['api_key']
-        }
-        if API_SETTINGS['api_point']:
-            self.api_point = API_SETTINGS['api_point']
-        else:
-            self.api_point = 'https://api.novaposhta.ua/v2.0/json/'
-
-    @staticmethod
-    def _clean_properties(method_properties):
-        return dict((k, v) for k, v in method_properties.items() if v)
 
     def send(self, method=None, method_props=None, test_url=None):
         """
@@ -60,36 +27,7 @@ class NovaPoshtaApi(object):
         :rtype:
             dict
         """
-        self.query['calledMethod'] = method
-        if method_props:
-            self.query['methodProperties'] = self._clean_properties(method_props)
-        url = self._get_api_url(method, test_url)
-        req = Request(url, serializer.dumps(self.query).encode('utf-8'))
-        resp = serializer.loads(urlopen(req).read().decode('utf-8'))
-        if resp["warnings"]:
-            logger.warning(
-                "Api returned warning list:\n%s",
-                [" * %s" % s for s in resp["warnings"]]
-            )
-        if not resp["success"]:
-            if resp["errorCodes"] == ['20000200068']:
-                cls = AuthError
-            else:
-                cls = ApiError
-            raise cls(resp["errorCodes"], resp["errors"])
-        return resp["data"]
-
-    def _get_api_url(self, method, test_url):
-        if 'testapi' in self.api_point:
-            if not test_url:
-                test_url = self.test_url
-            return self.api_point + test_url.format(
-                cls=self.__class__.__name__,
-                method=method,
-                format='json',
-            )
-        return self.api_point
-
+        return queries.send(self, method, method_props, test_url)
 
 
 class Address(NovaPoshtaApi):

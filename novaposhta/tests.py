@@ -3,6 +3,7 @@ python -m novaposhta.tests
 python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
 import unittest
+import logging
 
 from .models import Address, InternetDocument, Counterparty
 
@@ -29,4 +30,5 @@ class TestCounterparty(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()
