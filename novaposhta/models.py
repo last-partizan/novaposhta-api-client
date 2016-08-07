@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 >>> Address().get_cities() # doctest: +ELLIPSIS
-{...}
->>> Address().get_city_by_name(city='Здолбунів') # doctest: +ELLIPSIS
-{...}
+[...]
+>>> Address().get_cities(find='Здолбунів') # doctest: +ELLIPSIS
+[...]
 >>> InternetDocument().get_document_list() # doctest: +ELLIPSIS
-{...}
+[...]
+>>> Counterparty().get_counterparties() # doctest: +ELLIPSIS
+[...]
 """
 from __future__ import unicode_literals
 import logging
@@ -99,173 +101,54 @@ class NovaPoshtaApi(object):
         return self.api_point
 
 
+
 class Address(NovaPoshtaApi):
     """A class representing the `Address` model of Nova Poshta API.
     Used for parsing `geodata` (like cities, streets etc.).
     """
+    test_url="{format}/Address/{method}"
 
-    def get_city_ref(self, city):
-        """
-        Method for fetching `CityRef` (unique city hash) from API, required for other methods.
-
-        :example:
-            ``address = Address()``
-            ``address.get_city_ref(city='Здолбунів')``
-        :param city:
-            name of the required city
-        :type city:
-            str or unicode
-        :return:
-            parsed `CityRef` value (hash)
-        :rtype:
-            unicode
-        """
-        city_ref = self.get_city_by_name(city=city)['data'][0]['Ref']
-        return city_ref
-
-    def get_cities(self):
+    def get_cities(self, find=None):
         """
         Method for fetching info about all cities.
 
         :example:
             ``address = Address()``
             ``address.get_cities()``
+            ``address.get_cities(find='Здолбунів')``
         :return:
-            dictionary with info about all cities
+            list(dictionary)
         :rtype:
-            dict
+            list
         """
-        req = self.send(method='getCities')
-        return req
+        props = {} if not find else {'FindByString': find}
+        return self.send(method='getCities', method_props=props)
 
-    def get_city_by_name(self, city):
-        """
-        Method for fetching info about city by city name.
-
-        :example:
-            ``address = Address()``
-            ``address.get_city_by_name(city='Здолбунів')``
-        :param city:
-            name of the desired city
-        :type city:
-            str or unicode
-        :return:
-            dictionary with info about city
-        :rtype:
-            dict
-        """
-        req = self.send(method='getCities', method_props={'FindByString': city})
-        return req
-
-    def ex_get_streets(self, city):
-        """
-        Method for fetching all info about streets in provided city.
-        Extended version of `get_streets` method.
-        City name is used instead of ID.
-
-        :example:
-            ``address = Address()``
-            ``address.get_streets(city='Здолбунів')``
-        :param city:
-            name of the desired city
-        :type city:
-            str or unicode
-        :return:
-            dictionary with info about streets
-        :rtype:
-            dict
-        """
-        city_ref = self.get_city_ref(city=city)
-        req = self.send(method='getStreet', method_props={"CityRef": city_ref})
-        return req
-
-    def get_streets(self, city_ref):
+    def get_streets(self, city_ref, find=None):
         """
         Method for fetching info about streets in desired city.
 
         :example:
             ``address = Address()``
             ``address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698')``
+            ``address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698', find='Незалежності')``
         :param city_ref:
             ID of the target city
         :type city_ref:
             str or unicode
-        :return:
-            dictionary with info about streets
-        :rtype:
-            dict
-        """
-        req = self.send(method='getStreet', method_props={"CityRef": city_ref})
-        return req
-
-    def ex_get_street_by_name(self, city, street):
-        """
-        Method for fetching info about specific street in desired city.
-        Extended version of `get_street_by_name` method.
-        City name is used instead of ID.
-
-        :example:
-            ``address = Address()``
-            ``print address.ex_get_street_by_name(city='Здолбунів', street='Незалежності')``
-        :param city:
-            name of the target city
-        :type city:
-            str or unicode
-        :param street:
-            name of the street
-        :type street:
-            str or unicode
-        :return:
-            dictionary with info about street
-        :rtype:
-            dict
-        """
-        city_ref = self.get_city_ref(city=city)
-        req = self.send(method='getStreet', method_props={'CityRef': city_ref, 'FindByString': street})
-        return req
-
-    def get_street_by_name(self, city_ref, street):
-        """
-        Method for fetching info about specific street in desired city.
-
-        :example:
-            ``address = Address()``
-            ``address.get_street_by_name(city_ref='0006560c-4079-11de-b509-001d92f78698', street='Незалежності')``
-        :param city_ref:
-            ID of the target city
-        :type city_ref:
-            str or unicode
-        :param street:
+        :param find:
             name of the target street
         :type street:
             str or unicode
         :return:
-            dictionary with info about street
+            list(dictionary)
         :rtype:
-            dict
+            list
         """
-        req = self.send(method='getStreet', method_props={"CityRef": city_ref, "FindByString": street})
-        return req
-
-    def ex_get_warehouses(self, city):
-        """
-        Method for fetching info about all warehouses in desired city.
-        Extended version of `get_warehouses` method.
-        City name is used instead of ID.
-
-        :example:
-            ``address = Address()``
-            ``address.get_warehouses(city='Здолбунів')``
-        :param city:
-            name of the target city
-        :type city:
-            str or unicode
-        :return:
-            parsed dictionary with all info about warehouses
-        :rtype:
-            dict
-        """
-        return self.get_warehouses(self.get_city_ref(city=city))
+        props = {"CityRef": city_ref}
+        if find:
+            props["FindByString"] = find
+        return self.send(method='getStreet', method_props=props)
 
     def get_warehouses(self, city_ref):
         """
@@ -300,8 +183,7 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getWarehouseTypes')
-        return req
+        return self.send(method='getWarehouseTypes')
 
     def get_areas(self):
         """
@@ -315,8 +197,7 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getAreas')
-        return req
+        return self.send(method='getAreas')
 
     def save(self, from_data=None, cp_ref=None, str_ref=None, build_num=None, flat=None, note=None):
         """
@@ -374,8 +255,7 @@ class Address(NovaPoshtaApi):
                 'Flat': flat,
                 'Note': note
             }
-        req = self.send(method='save', method_props=props)
-        return req
+        return self.send(method='save', method_props=props)
 
     def update(self, from_data=None, cp_ref=None, add_ref=None, str_ref=None, build_num=None, flat=None, note=None):
         """
@@ -425,8 +305,7 @@ class Address(NovaPoshtaApi):
                 'Flat': flat,
                 'Note': note
             }
-        req = self.send(method='update', method_props=props)
-        return req
+        return self.send(method='update', method_props=props)
 
     def delete(self, add_ref):
         """
@@ -442,8 +321,7 @@ class Address(NovaPoshtaApi):
         props = {
             'Ref': add_ref
         }
-        req = self.send(method='delete', method_props=props)
-        return req
+        return self.send(method='delete', method_props=props)
 
 
 class Counterparty(NovaPoshtaApi):
@@ -451,7 +329,7 @@ class Counterparty(NovaPoshtaApi):
     A class representing the `Counterparty` model of Nova Poshta API.
     Used for interact with counterpart's info.
     """
-    test_url = "Counterparty/{format}/{method}/)"
+    test_url = "Counterparty/{format}/{method}/"
 
     def get_counterparties(self, cp_type='Sender'):
         """
@@ -470,7 +348,8 @@ class Counterparty(NovaPoshtaApi):
             dict
         """
         return self.send(method='getCounterparties',
-                         method_props={"CounterpartyProperty": cp_type})
+                         method_props={"CounterpartyProperty": cp_type},
+                         )
 
     def get_counterparty_by_name(self, name, cp_type='Sender'):
         """
