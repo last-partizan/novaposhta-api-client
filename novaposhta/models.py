@@ -466,8 +466,10 @@ class Counterparty(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCounterparties', method_props={"CounterpartyProperty": cp_type})
-        return req
+        return self.send(method='getCounterparties',
+                         method_props={"CounterpartyProperty": cp_type},
+                         test_url="Counterparty/{format}/{method}/)",
+                         )
 
     def get_counterparty_by_name(self, name, cp_type='Sender'):
         """
