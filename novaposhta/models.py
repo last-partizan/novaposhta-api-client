@@ -764,28 +764,6 @@ class Common(NovaPoshtaApi):
         req = self.send(method='getTypesOfPayersForRedelivery')
         return req
 
-    def ex_get_time_intervals(self, city, datetime):
-        """
-        Method for fetching info about time intervals (for ordering "time intervals" service).
-        Extended version of `get_time_intervals`.
-        City name is used instead of ID.
-
-        :example:
-        ``common = Common()``
-        ``common.ex_get_time_intervals(city='Рівне', datetime='2.10.2015')``
-        :param city:
-            name of the recipient's city
-        :param datetime:
-            date for getting info about time intervals ('dd.mm.yyyy' date format)
-        :return:
-            dictionary with info about time intervals
-        :rtype:
-            dict
-        """
-        city_ref = Address().get_city_by_name(city)['data'][0]['Ref']
-        req = self.send(method='getTimeIntervals', method_props={'RecipientCityRef': city_ref, 'DateTime': datetime})
-        return req
-
     def get_time_intervals(self, city_ref, datetime):
         """
         Method for fetching info about time intervals (for ordering "time intervals" service).
