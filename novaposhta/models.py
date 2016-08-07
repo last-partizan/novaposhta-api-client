@@ -69,7 +69,8 @@ class NovaPoshtaApi(object):
         self.query['calledMethod'] = method
         if method_props:
             self.query['methodProperties'] = self._clean_properties(method_props)
-        req = Request(self._get_api_url(method, test_url), json.dumps(self.query).encode('utf-8'))
+        url = self._get_api_url(method, test_url)
+        req = Request(url, json.dumps(self.query).encode('utf-8'))
         resp = json.loads(urlopen(req).read().decode('utf-8'))
         if resp["warnings"]:
             logger.warning(
@@ -262,9 +263,7 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        city_ref = self.get_city_ref(city=city)
-        req = self.send(method='getWarehouses', method_props={'CityRef': city_ref})
-        return req
+        return self.get_warehouses(self.get_city_ref(city=city))
 
     def get_warehouses(self, city_ref):
         """
@@ -282,8 +281,10 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getWarehouses', method_props={"CityRef": city_ref})
-        return req
+        return self.send(
+            method='getWarehouses', method_props={"CityRef": city_ref},
+            test_url="{format}/AddressGeneral/{method}",
+        )
 
     def get_warehouse_types(self):
         """
