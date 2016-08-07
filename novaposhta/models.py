@@ -27,6 +27,8 @@ class NovaPoshtaApi(object):
     """A base API class, that holds shared methods and settings for other models.
     Creates basic query object and provide `apiKey` and API endpoint configuration.
     """
+    # api path for testapi
+    test_url = "{format}/{cls}/{method}/"
 
     def __init__(self):
         """
@@ -88,7 +90,7 @@ class NovaPoshtaApi(object):
     def _get_api_url(self, method, test_url):
         if 'testapi' in self.api_point:
             if not test_url:
-                test_url = "{format}/{cls}/{method}/"
+                test_url = self.test_url
             return self.api_point + test_url.format(
                 cls=self.__class__.__name__,
                 method=method,
@@ -449,6 +451,7 @@ class Counterparty(NovaPoshtaApi):
     A class representing the `Counterparty` model of Nova Poshta API.
     Used for interact with counterpart's info.
     """
+    test_url = "Counterparty/{format}/{method}/)"
 
     def get_counterparties(self, cp_type='Sender'):
         """
@@ -467,9 +470,7 @@ class Counterparty(NovaPoshtaApi):
             dict
         """
         return self.send(method='getCounterparties',
-                         method_props={"CounterpartyProperty": cp_type},
-                         test_url="Counterparty/{format}/{method}/)",
-                         )
+                         method_props={"CounterpartyProperty": cp_type})
 
     def get_counterparty_by_name(self, name, cp_type='Sender'):
         """
@@ -1225,14 +1226,13 @@ class ContactPerson(NovaPoshtaApi):
 
 
 class InternetDocument(NovaPoshtaApi):
+    test_url="en/{format}/{method}/"
 
     def get_document_list(self, **kwargs):
-        return self.send(method='getDocumentList', method_props=kwargs,
-                         test_url="en/{format}/{method}/")
+        return self.send(method='getDocumentList', method_props=kwargs)
 
     def save(self, **kwargs):
-        return self.send(method="save", method_props=kwargs,
-                         test_url="en/{method}/{format}/")
+        return self.send(method="save", method_props=kwargs)
 
 
 if __name__ == "__main__":
