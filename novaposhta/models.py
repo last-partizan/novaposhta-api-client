@@ -276,8 +276,7 @@ class Counterparty(NovaPoshtaApi):
             dict
         """
         return self.send(method='getCounterparties',
-                         method_props={"CounterpartyProperty": cp_type},
-                         )
+                         method_props={"CounterpartyProperty": cp_type})
 
     def get_counterparty_by_name(self, name, cp_type='Sender'):
         """
@@ -301,57 +300,6 @@ class Counterparty(NovaPoshtaApi):
         """
         req = self.send(method='getCounterparties',
                         method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
-        return req
-
-    def get_counterparty_ref(self, name, cp_type='Sender'):
-        """
-        Method for fetching `Ref` (unique counterparty hash) from API, required for other methods.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_ref(name='Талісман', cp_type='Recipient')``
-        :param name:
-            name of the desired counterparty
-        :type name:
-            str or unicode
-        :param cp_type:
-            type of the counterparty: can be either `Sender` or `Recipient` (`Sender` used as default)
-        :type cp_type:
-            str or unicode
-        :return:
-            ID of the counterparty
-        :rtype:
-            unicode
-        """
-        props = {'CounterpartyProperty': cp_type, 'FindByString': name}  # separate for a better look :)
-        req = self.send(method='getCounterparties', method_props=props)['data'][0]['Ref']
-        return req
-
-    def ex_get_counterparty_by_edrpou(self, city, code):
-        """
-        Method for fetching info about counterparty by `EDRPOU` - National State Registry
-        of Ukrainian Enterprises and Organizations (8-digit code).
-        Extended version of `get_counterparty_by_edrpou` method.
-        City name is used instead of ID.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_by_edrpou(city='Здолбунів', code='12345678')``
-        :param city:
-            name of the city of counterparty
-        :type city:
-            str or unicode
-        :param code:
-            EDRPOU code of the counterparty
-        :type code:
-            str or unicode
-        :return:
-            dictionary with info about counterparty
-        :rtype:
-            dict
-        """
-        city_ref = Address().get_city_by_name(city)['data'][0]['Ref']
-        req = self.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
         return req
 
     def get_counterparty_by_edrpou(self, city_ref, code):
@@ -378,31 +326,6 @@ class Counterparty(NovaPoshtaApi):
         req = self.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
         return req
 
-    def ex_get_counterparty_addresses(self, name, cp_type='Sender'):
-        """
-        Method for fetching counterparty's addresses.
-        Extended version of `get_counterparty_addresses` method.
-        Counterparty's name is used instead of ID.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_addresses('Талісман', cp_type='Recipient')``
-        :param name:
-            name of the counterparty
-        :type name:
-            str or unicode
-        :param cp_type:
-            type of the counterparty: can be either `Sender` or `Recipient` (`Sender` used as default)
-        :type cp_type:
-            str or unicode
-        :return:
-            dictionary with info about counterparty's addresses
-        """
-        cp_ref = self.get_counterparty_ref(name=name, cp_type=cp_type)
-        req = self.send(method='getCounterpartyAddresses',
-                        method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
-        return req
-
     def get_counterparty_addresses(self, cp_ref, cp_type='Sender'):
         """
         Method for fetching counterparty's addresses.
@@ -423,30 +346,6 @@ class Counterparty(NovaPoshtaApi):
         """
         req = self.send(method='getCounterpartyAddresses',
                         method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
-        return req
-
-    def ex_get_counterparty_contact_persons(self, name, cp_type='Sender'):
-        """
-        Method for fetching info about counterparty's contact persons.
-        Extended version of `get_counterparty_contact_persons` method.
-        Counterparty's name is used instead of ID (additionally, counterparty type should be used).
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.ex_get_counterparty_contact_persons('Талісман', cp_type='Recipient')``
-        :param name:
-            name of the counterparty
-        :type name:
-            str or unicode
-        :param cp_type:
-            type of the counterparty: can be either `Sender` or `Recipient` (`Sender` used as default)
-        :type cp_type:
-            str or unicode
-        :return:
-            dictionary with info about counterparty's contact persons
-        """
-        cp_ref = self.get_counterparty_ref(name=name, cp_type=cp_type)
-        req = self.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
         return req
 
     def get_counterparty_contact_persons(self, cp_ref):
