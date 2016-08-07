@@ -1095,10 +1095,13 @@ class ContactPerson(NovaPoshtaApi):
 
 
 class InternetDocument(NovaPoshtaApi):
-    test_url="en/{format}/{method}/"
+    test_url="en/{method}/{format}/"
 
     def get_document_list(self, **kwargs):
-        return self.send(method='getDocumentList', method_props=kwargs)
+        return self.send(
+            method='getDocumentList', method_props=kwargs,
+            test_url="en/{format}/{method}/",
+        )
 
     def save(self, **kwargs):
         return self.send(method="save", method_props=kwargs)

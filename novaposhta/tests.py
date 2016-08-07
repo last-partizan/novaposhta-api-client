@@ -1,5 +1,6 @@
 """
 python -m novaposhta.tests
+python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
 import unittest
 
@@ -16,6 +17,9 @@ class TestInternetDocument(unittest.TestCase):
 
     def test_get_document_list(self):
         self.assertIsInstance(InternetDocument().get_document_list(), list)
+
+    def test_save(self):
+        InternetDocument().save()
 
 
 class TestCounterparty(unittest.TestCase):
