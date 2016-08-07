@@ -15,8 +15,8 @@ try:
 except ImportError:
     #  python3
     from urllib.request import Request, urlopen
-import json
 
+from . import serializer
 from .conf import API_SETTINGS
 from .api.exceptions import ApiError, AuthError
 
@@ -70,8 +70,8 @@ class NovaPoshtaApi(object):
         if method_props:
             self.query['methodProperties'] = self._clean_properties(method_props)
         url = self._get_api_url(method, test_url)
-        req = Request(url, json.dumps(self.query).encode('utf-8'))
-        resp = json.loads(urlopen(req).read().decode('utf-8'))
+        req = Request(url, serializer.dumps(self.query).encode('utf-8'))
+        resp = serializer.loads(urlopen(req).read().decode('utf-8'))
         if resp["warnings"]:
             logger.warning(
                 "Api returned warning list:\n%s",
