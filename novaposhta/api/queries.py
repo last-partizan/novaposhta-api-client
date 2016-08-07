@@ -42,10 +42,12 @@ def send(cls, method, method_props=None, test_url=None):
     }
 
     url = _get_api_url(cls, method, test_url or cls.test_url)
-    data = serializer.dumps(query, indent=2)
+    data = serializer.dumps(query, indent=2, ensure_ascii=False)
     logger.debug("send: %s\n%s", url, data)
-    req = Request(url, data.encode('utf-8'))
-    resp = serializer.loads(urlopen(req).read().decode('utf-8'))
+    req = Request(url, serializer.dumps(query).encode('utf-8'))
+    resp_raw = urlopen(req).read().decode('utf-8')
+    resp = serializer.loads(resp_raw)
+    logger.debug("received:\n%s", serializer.dumps(resp, indent=2, ensure_ascii=False))
     if resp["warnings"]:
         logger.warning(
             "Api returned warning list:\n%s",
