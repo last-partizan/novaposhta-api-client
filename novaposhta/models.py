@@ -1,14 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
->>> Address().get_cities() # doctest: +ELLIPSIS
-[...]
->>> Address().get_cities(find='Здолбунів') # doctest: +ELLIPSIS
-[...]
->>> InternetDocument().get_document_list() # doctest: +ELLIPSIS
-[...]
->>> Counterparty().get_counterparties() # doctest: +ELLIPSIS
-[...]
-"""
 from __future__ import unicode_literals
 import logging
 
