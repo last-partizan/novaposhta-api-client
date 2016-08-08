@@ -8,7 +8,14 @@ class NovaPoshtaApi(object):
     # api path for testapi
     test_url = "{format}/{cls}/{method}/"
 
-    def send(self, method=None, method_props=None, test_url=None):
+    def __init__(self, **params):
+        self.__dict__.update(params)
+
+    def __repr__(self):
+        return "<{}: {}>".format(self.__class__.__name__, str(self))
+
+    @classmethod
+    def send(cls, method=None, method_props=None, test_url=None):
         """
         Primary method for API requests and data fetching.
         It uses `urllib2` and `json` libs for requests to API through `HTTP` protocol.
@@ -27,7 +34,7 @@ class NovaPoshtaApi(object):
         :rtype:
             dict
         """
-        return queries.send(self, method, method_props, test_url)
+        return queries.send(cls, method, method_props, test_url)
 
 
 class Address(NovaPoshtaApi):
@@ -36,7 +43,11 @@ class Address(NovaPoshtaApi):
     """
     test_url="{format}/Address/{method}"
 
-    def get_cities(self, find=None):
+    def __str__(self):
+        return self.Description
+
+    @classmethod
+    def get_cities(cls, find=None):
         """
         Method for fetching info about all cities.
 
@@ -50,9 +61,10 @@ class Address(NovaPoshtaApi):
             list
         """
         props = {} if not find else {'FindByString': find}
-        return self.send(method='getCities', method_props=props)
+        return cls.send(method='getCities', method_props=props)
 
-    def get_streets(self, city_ref, find=None):
+    @classmethod
+    def get_streets(cls, city_ref, find=None):
         """
         Method for fetching info about streets in desired city.
 
@@ -76,9 +88,10 @@ class Address(NovaPoshtaApi):
         props = {"CityRef": city_ref}
         if find:
             props["FindByString"] = find
-        return self.send(method='getStreet', method_props=props)
+        return cls.send(method='getStreet', method_props=props)
 
-    def get_warehouses(self, city_ref):
+    @classmethod
+    def get_warehouses(cls, city_ref):
         """
         Method for fetching info about all warehouses in desired city.
 
@@ -94,12 +107,13 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        return self.send(
+        return cls.send(
             method='getWarehouses', method_props={"CityRef": city_ref},
             test_url="{format}/AddressGeneral/{method}",
         )
 
-    def get_warehouse_types(self):
+    @classmethod
+    def get_warehouse_types(cls):
         """
         Method for fetching info about warehouse's types.
 
@@ -111,9 +125,10 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        return self.send(method='getWarehouseTypes')
+        return cls.send(method='getWarehouseTypes')
 
-    def get_areas(self):
+    @classmethod
+    def get_areas(cls):
         """
         Method for fetching info about areas geographical areas.
 
@@ -125,9 +140,10 @@ class Address(NovaPoshtaApi):
         :rtype:
             dict
         """
-        return self.send(method='getAreas')
+        return cls.send(method='getAreas')
 
-    def save(self, from_data=None, cp_ref=None, str_ref=None, build_num=None, flat=None, note=None):
+    @classmethod
+    def save(cls, from_data=None, cp_ref=None, str_ref=None, build_num=None, flat=None, note=None):
         """
         Method for saving counterparty's address
 
@@ -183,9 +199,10 @@ class Address(NovaPoshtaApi):
                 'Flat': flat,
                 'Note': note
             }
-        return self.send(method='save', method_props=props)
+        return cls.send(method='save', method_props=props)
 
-    def update(self, from_data=None, cp_ref=None, add_ref=None, str_ref=None, build_num=None, flat=None, note=None):
+    @classmethod
+    def update(cls, from_data=None, cp_ref=None, add_ref=None, str_ref=None, build_num=None, flat=None, note=None):
         """
         Method for updating counterparty's address
 
@@ -233,9 +250,10 @@ class Address(NovaPoshtaApi):
                 'Flat': flat,
                 'Note': note
             }
-        return self.send(method='update', method_props=props)
+        return cls.send(method='update', method_props=props)
 
-    def delete(self, add_ref):
+    @classmethod
+    def delete(cls, add_ref):
         """
         Method for deleting saved address
         :param add_ref:
@@ -249,7 +267,7 @@ class Address(NovaPoshtaApi):
         props = {
             'Ref': add_ref
         }
-        return self.send(method='delete', method_props=props)
+        return cls.send(method='delete', method_props=props)
 
 
 class Counterparty(NovaPoshtaApi):
@@ -259,7 +277,8 @@ class Counterparty(NovaPoshtaApi):
     """
     test_url = "Counterparty/{format}/{method}/"
 
-    def get_counterparties(self, cp_type='Sender'):
+    @classmethod
+    def get_counterparties(cls, cp_type='Sender'):
         """
         Method for fetching all information about counterparties.
 
@@ -275,10 +294,11 @@ class Counterparty(NovaPoshtaApi):
         :rtype:
             dict
         """
-        return self.send(method='getCounterparties',
+        return cls.send(method='getCounterparties',
                          method_props={"CounterpartyProperty": cp_type})
 
-    def get_counterparty_by_name(self, name, cp_type='Sender'):
+    @classmethod
+    def get_counterparty_by_name(cls, name, cp_type='Sender'):
         """
         Method for fetching info about counterparty by name.
 
@@ -298,11 +318,12 @@ class Counterparty(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCounterparties',
+        req = cls.send(method='getCounterparties',
                         method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
         return req
 
-    def get_counterparty_by_edrpou(self, city_ref, code):
+    @classmethod
+    def get_counterparty_by_edrpou(cls, city_ref, code):
         """
         Method for fetching info about counterparty by `EDRPOU` - National State Registry
         of Ukrainian Enterprises and Organizations (8-digit code).
@@ -323,10 +344,11 @@ class Counterparty(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
+        req = cls.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
         return req
 
-    def get_counterparty_addresses(self, cp_ref, cp_type='Sender'):
+    @classmethod
+    def get_counterparty_addresses(cls, cp_ref, cp_type='Sender'):
         """
         Method for fetching counterparty's addresses.
 
@@ -344,11 +366,12 @@ class Counterparty(NovaPoshtaApi):
         :return:
             dictionary with info about counterparty's addresses
         """
-        req = self.send(method='getCounterpartyAddresses',
+        req = cls.send(method='getCounterpartyAddresses',
                         method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
         return req
 
-    def get_counterparty_contact_persons(self, cp_ref):
+    @classmethod
+    def get_counterparty_contact_persons(cls, cp_ref):
         """
         Method for fetching info about counterparty's contact persons.
 
@@ -362,10 +385,11 @@ class Counterparty(NovaPoshtaApi):
         :return:
             dictionary with info about counterparty's contact persons
         """
-        req = self.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
+        req = cls.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
         return req
 
-    def save(self,  # TODO: Default values!
+    @classmethod
+    def save(cls,  # TODO: Default values!
              from_data=None,
              city_ref=None,
              first_name=None,
@@ -448,11 +472,12 @@ class Counterparty(NovaPoshtaApi):
                 'CounterpartyType': cp_type,
                 'CounterpartyProperty': cp_prop
             }
-        req = self.send(method='save', method_props=props)
+        req = cls.send(method='save', method_props=props)
         return req
 
     # TODO: API requires all fields to be passed. Maybe we can pre-fetch data from API and use if no need to update it
-    def update(self,
+    @classmethod
+    def update(cls,
                from_data=None,
                cp_ref=None,
                city_ref=None,
@@ -549,10 +574,11 @@ class Counterparty(NovaPoshtaApi):
                 'CounterpartyProperty': cp_prop,
                 'OwnershipForm': own_form
             }
-        req = self.send(method='update', method_props=props)
+        req = cls.send(method='update', method_props=props)
         return req
 
-    def delete(self, cp_ref):
+    @classmethod
+    def delete(cls, cp_ref):
         """
         Method for deleting counterparties.
         Due to restrictions, only `Recipient` counterparty type can be deleted.
@@ -567,14 +593,16 @@ class Counterparty(NovaPoshtaApi):
         :return:
             dictionary with ID of deleted counterparty
         """
-        req = self.send(method='delete', method_props={'Ref': cp_ref})
+        req = cls.send(method='delete', method_props={'Ref': cp_ref})
         return req
 
-    # def save_third_person(self):
+    # @classmethod
+    #def save_third_person(cls):
     #     """Not implemented due to contract lack, will be here in the future. Maybe :)"""
     #     return False
 
-    def get_counterparty_options(self, cp_ref):
+    @classmethod
+    def get_counterparty_options(cls, cp_ref):
         """
         Method for getting counterparties options.
 
@@ -588,7 +616,7 @@ class Counterparty(NovaPoshtaApi):
         :return:
             dictionary with counterparty's options
         """
-        req = self.send(method='getCounterpartyOptions', method_props={'Ref': cp_ref})
+        req = cls.send(method='getCounterpartyOptions', method_props={'Ref': cp_ref})
         return req
 
 
@@ -597,7 +625,8 @@ class Common(NovaPoshtaApi):
     Used for parsing common (obviously) information, which represents different data (cargo, payment etc.).
     """
 
-    def get_types_of_payers(self):
+    @classmethod
+    def get_types_of_payers(cls):
         """
         Method for fetching info about types of payers.
 
@@ -607,10 +636,11 @@ class Common(NovaPoshtaApi):
         :return:
             dictionary with info about types of payers
         """
-        req = self.send(method='getTypesOfPayers')
+        req = cls.send(method='getTypesOfPayers')
         return req
 
-    def get_payment_forms(self):
+    @classmethod
+    def get_payment_forms(cls):
         """
         Method for fetching info about possible payment forms.
 
@@ -622,10 +652,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getPaymentForms')
+        req = cls.send(method='getPaymentForms')
         return req
 
-    def get_cargo_types(self):
+    @classmethod
+    def get_cargo_types(cls):
         """
         Method for fetching info about cargo types.
 
@@ -637,10 +668,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCargoTypes')
+        req = cls.send(method='getCargoTypes')
         return req
 
-    def get_service_types(self):
+    @classmethod
+    def get_service_types(cls):
         """
         Method for fetching info about possible delivery methods.
 
@@ -652,10 +684,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getServiceTypes')
+        req = cls.send(method='getServiceTypes')
         return req
 
-    def get_cargo_description_list(self):
+    @classmethod
+    def get_cargo_description_list(cls):
         """
         Method for fetching the directory of cargo description.
 
@@ -667,10 +700,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCargoDescriptionList')
+        req = cls.send(method='getCargoDescriptionList')
         return req
 
-    def search_cargo_description_list(self, keyword):
+    @classmethod
+    def search_cargo_description_list(cls, keyword):
         """
         Method for fetching cargo description by keyword.
         In general, it is extended version of `get_cargo_description_list` with `FindByString` API's methods param.
@@ -686,10 +720,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getCargoDescriptionList', method_props={'FindByString': keyword})
+        req = cls.send(method='getCargoDescriptionList', method_props={'FindByString': keyword})
         return req
 
-    def get_ownership_forms_list(self):
+    @classmethod
+    def get_ownership_forms_list(cls):
         """
         Method for fetching info about ownership forms.
 
@@ -701,10 +736,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getOwnershipFormsList')
+        req = cls.send(method='getOwnershipFormsList')
         return req
 
-    def get_backward_delivery_cargo_types(self):
+    @classmethod
+    def get_backward_delivery_cargo_types(cls):
         """
         Method for fetching info about backward delivery cargo types.
 
@@ -716,10 +752,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getBackwardDeliveryCargoTypes')
+        req = cls.send(method='getBackwardDeliveryCargoTypes')
         return req
 
-    def get_pallets_list(self):
+    @classmethod
+    def get_pallets_list(cls):
         """
         Method for fetching info about pallets for backward delivery.
 
@@ -731,10 +768,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getPalletsList')
+        req = cls.send(method='getPalletsList')
         return req
 
-    def get_type_of_counterparties(self):
+    @classmethod
+    def get_type_of_counterparties(cls):
         """
         Method for fetching info about types of counterparties.
 
@@ -746,10 +784,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getTypesOfCounterparties')
+        req = cls.send(method='getTypesOfCounterparties')
         return req
 
-    def get_type_of_payers_for_redelivery(self):
+    @classmethod
+    def get_type_of_payers_for_redelivery(cls):
         """
         Method for fetching info about types of payers for redelivery.
 
@@ -761,10 +800,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getTypesOfPayersForRedelivery')
+        req = cls.send(method='getTypesOfPayersForRedelivery')
         return req
 
-    def get_time_intervals(self, city_ref, datetime):
+    @classmethod
+    def get_time_intervals(cls, city_ref, datetime):
         """
         Method for fetching info about time intervals (for ordering "time intervals" service).
 
@@ -780,10 +820,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getTimeIntervals', method_props={'RecipientCityRef': city_ref, 'DateTime': datetime})
+        req = cls.send(method='getTimeIntervals', method_props={'RecipientCityRef': city_ref, 'DateTime': datetime})
         return req
 
-    def get_tires_wheels_list(self):
+    @classmethod
+    def get_tires_wheels_list(cls):
         """
         Method for fetching info about tires and wheels (if cargo is "tires-wheels").
 
@@ -795,10 +836,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getTiresWheelsList')
+        req = cls.send(method='getTiresWheelsList')
         return req
 
-    def get_trays_list(self):
+    @classmethod
+    def get_trays_list(cls):
         """
         Method for fetching info about trays (if backward delivery is ordered).
 
@@ -810,10 +852,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getTraysList')
+        req = cls.send(method='getTraysList')
         return req
 
-    def get_document_statuses(self):
+    @classmethod
+    def get_document_statuses(cls):
         """
         Method for fetching info about statuses of documents.
 
@@ -825,10 +868,11 @@ class Common(NovaPoshtaApi):
         :rtype:
             dict
         """
-        req = self.send(method='getDocumentStatuses')
+        req = cls.send(method='getDocumentStatuses')
         return req
 
-    def get_document_status(self, state_id=None, group_id=None, state_name=None):
+    @classmethod
+    def get_document_status(cls, state_id=None, group_id=None, state_name=None):
         """
         Method for fetching info about status of one document.
         Can be filtered by several params (one or many).
@@ -862,7 +906,7 @@ class Common(NovaPoshtaApi):
             'GroupId': group_id,
             'StateName': state_name
         }
-        req = self.send(method='getDocumentStatuses', method_props=filter_by)
+        req = cls.send(method='getDocumentStatuses', method_props=filter_by)
         return req
 
 
@@ -872,7 +916,8 @@ class ContactPerson(NovaPoshtaApi):
     :NOTE: All counterpart details must be only in Ukrainian.
     """
 
-    def save(self, cp_ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
+    @classmethod
+    def save(cls, cp_ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
         if from_data:
             props = from_data
         else:
@@ -883,10 +928,11 @@ class ContactPerson(NovaPoshtaApi):
                 'MiddleName': mid_name,
                 'Phone': phone,
             }
-        req = self.send(method='save', method_props=props)
+        req = cls.send(method='save', method_props=props)
         return req
 
-    def update(self, cp_ref=None, ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
+    @classmethod
+    def update(cls, cp_ref=None, ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
         if from_data:
             props = from_data
         else:
@@ -898,28 +944,31 @@ class ContactPerson(NovaPoshtaApi):
                 'MiddleName': mid_name,
                 'Phone': phone,
             }
-        req = self.send(method='update', method_props=props)
+        req = cls.send(method='update', method_props=props)
         return req
 
-    def delete(self, cp_ref=None):
+    @classmethod
+    def delete(cls, cp_ref=None):
         props = {
             'Ref': cp_ref
         }
-        req = self.send(method='delete', method_props=props)
+        req = cls.send(method='delete', method_props=props)
         return req
 
 
 class InternetDocument(NovaPoshtaApi):
     test_url="en/{method}/{format}/"
 
-    def get_document_list(self, **kwargs):
-        return self.send(
+    @classmethod
+    def get_document_list(cls, **kwargs):
+        return cls.send(
             method='getDocumentList', method_props=kwargs,
             test_url="en/{format}/{method}/",
         )
 
-    def save(self, **kwargs):
-        return self.send(method="save", method_props=kwargs)
+    @classmethod
+    def save(cls, **kwargs):
+        return cls.send(method="save", method_props=kwargs)
 
 
 if __name__ == "__main__":

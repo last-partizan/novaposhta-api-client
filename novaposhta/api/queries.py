@@ -35,7 +35,7 @@ def send(cls, method, method_props=None, test_url=None):
         dict
     """
     query = {
-        'modelName': cls.__class__.__name__,
+        'modelName': cls.__name__,
         'calledMethod': method,
         'methodProperties': _clean_properties(method_props or {}),
         'apiKey': API_SETTINGS['api_key']
@@ -55,11 +55,14 @@ def send(cls, method, method_props=None, test_url=None):
         )
     if not resp["success"]:
         if resp["errorCodes"] == ['20000200068']:
-            cls = AuthError
+            errcls = AuthError
         else:
-            cls = ApiError
-        raise cls(resp["errorCodes"], resp["errors"])
-    return resp["data"]
+            errcls = ApiError
+        raise errcls(resp["errorCodes"], resp["errors"])
+    if isinstance(resp["data"], dict):
+        return cls(**resp["data"])
+    else:
+        return [cls(**attrs) for attrs in resp["data"]]
 
 
 def _clean_properties(method_properties):
@@ -70,7 +73,7 @@ def _get_api_url(cls, method, test_url):
     endpoint = API_SETTINGS['api_point']
     if 'testapi' in endpoint:
         return endpoint + test_url.format(
-            cls=cls.__class__.__name__,
+            cls=cls.__name__,
             method=method,
             format='json',
         )
