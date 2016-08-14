@@ -60,6 +60,7 @@ class BaseActions(object):
         return self.send(method='delete', method_props={'Ref': self.Ref})
 
 
+@NovaPoshta.model
 class Address(BaseActions, Model):
     """A class representing the `Address` model of Nova Poshta API.
     Used for parsing `geodata` (like cities, streets etc.).
@@ -162,6 +163,7 @@ class Address(BaseActions, Model):
         return cls.send(method='getAreas')
 
 
+@NovaPoshta.model
 class ContactPerson(BaseActions, Model):
     """
     A class representing the `ContactPerson` model of Nova Poshta API.
@@ -170,6 +172,7 @@ class ContactPerson(BaseActions, Model):
     """
 
 
+@NovaPoshta.model
 class Counterparty(BaseActions, Model):
     """
     A class representing the `Counterparty` model of Nova Poshta API.
@@ -316,6 +319,7 @@ class Counterparty(BaseActions, Model):
         return req
 
 
+@NovaPoshta.model
 class Common(Model):
     """A class representing the `Common` model of Nova Poshta API.
     Used for parsing common (obviously) information, which represents different data (cargo, payment etc.).
@@ -589,6 +593,7 @@ class Common(Model):
         return req
 
 
+@NovaPoshta.model
 class InternetDocument(BaseActions, Model):
     test_url="en/{method}/{format}/"
 
