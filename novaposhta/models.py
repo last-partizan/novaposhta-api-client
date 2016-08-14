@@ -1,50 +1,70 @@
 # coding: utf-8
-from .api import queries
+from .api import NovaPoshta
 
-class NovaPoshtaApi(object):
-    """A base API class, that holds shared methods and settings for other models.
-    Creates basic query object and provide `apiKey` and API endpoint configuration.
+
+class Model(object):
+    """
+    Base model layer
     """
     # api path for testapi
     test_url = "{format}/{cls}/{method}/"
+    api = NovaPoshta()
+
+    object_attrs = {}
 
     def __init__(self, **params):
+        for k, v in self.object_attrs.items():
+            try:
+                params[k] = v(**params[k]['data'][0])
+            except KeyError:
+                pass
         self.__dict__.update(params)
+
+    @property
+    def data(self):
+        return self.__dict__
 
     def __repr__(self):
         return "<{}: {}>".format(self.__class__.__name__, str(self))
 
+    def __str__(self):
+        try:
+            return self.Description
+        except AttributeError:
+            return "{} object".format(self.__class__.__name__)
+
     @classmethod
-    def send(cls, method=None, method_props=None, test_url=None):
-        """
-        Primary method for API requests and data fetching.
-        It uses `urllib2` and `json` libs for requests to API through `HTTP` protocol.
-        Modifies API template and then makes request to API endpoint.
-
-        :param method:
-            name of the API method, should be passed for every request
-        :type method:
-            str or unicode
-        :param method_props:
-            additional params for API methods.
-        :type method_props:
-            dict
-        :return:
-            dictionary with fetched info
-        :rtype:
-            dict
-        """
-        return queries.send(cls, method, method_props, test_url)
+    def send(cls, method, method_props, test_url=None, raw=False):
+        raw = cls.api.send(
+            cls.api.build_url(cls, method, test_url or cls.test_url),
+            cls.__name__, method, method_props
+        )
+        if isinstance(raw, dict):
+            return cls(**raw)
+        else:
+            return [cls(**attrs) for attrs in raw]
 
 
-class Address(NovaPoshtaApi):
+class BaseActions(object):
+
+    def save(self):
+        """Saving object"""
+        return self.send(method='save', method_props=self.data)[0]
+
+    def update(self):
+        """Updating object"""
+        return self.send(method='update', method_props=self.data)
+
+    def delete(self):
+        """Deleting objects"""
+        return self.send(method='delete', method_props={'Ref': self.Ref})
+
+
+class Address(BaseActions, Model):
     """A class representing the `Address` model of Nova Poshta API.
     Used for parsing `geodata` (like cities, streets etc.).
     """
     test_url="{format}/Address/{method}"
-
-    def __str__(self):
-        return self.Description
 
     @classmethod
     def get_cities(cls, find=None):
@@ -60,8 +80,7 @@ class Address(NovaPoshtaApi):
         :rtype:
             list
         """
-        props = {} if not find else {'FindByString': find}
-        return cls.send(method='getCities', method_props=props)
+        return cls.send(method='getCities', method_props={'FindByString': find})
 
     @classmethod
     def get_streets(cls, city_ref, find=None):
@@ -142,140 +161,25 @@ class Address(NovaPoshtaApi):
         """
         return cls.send(method='getAreas')
 
-    @classmethod
-    def save(cls, from_data=None, cp_ref=None, str_ref=None, build_num=None, flat=None, note=None):
-        """
-        Method for saving counterparty's address
 
-        :example:
-            ``address = Address()``
-            ``address.save(cp_ref='5953fb16-08d8-11e4-8958-0025909b4e33',``
-            ``str_ref='d8364179-4149-11dd-9198-001d60451983', build_num='20',``
-            ``flat='10')``
-            or:
-            ``address = Address()``
-            ``data = {
-            ``        cp_ref='5953fb16-08d8-11e4-8958-0025909b4e33',``
-            ``        str_ref='d8364179-4149-11dd-9198-001d60451983',
-            ``        build_num='20',``
-            ``        flat='10'}``
-            ``address.save(from_data=data)``
-        :param from_data:
-            dictionary with all required data, will be used instead of passing each keyword separately
-        :type from_data:
-            dict
-        :param cp_ref:
-            ID of the counterparty
-        :type cp_ref:
-            str or unicode
-        :param str_ref:
-            ID of the street
-        :type str_ref:
-            str or unicode
-        :param build_num:
-            building number
-        :type build_num:
-            str or unicode
-        :param flat:
-            flat number
-        :type flat:
-            str or unicode
-        :param note:
-            comment
-        :type:
-            str or unicode
-        :return:
-            dictionary with info about saved address
-        :rtype:
-             dict
-        """
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'CounterpartyRef': cp_ref,
-                'StreetRef': str_ref,
-                'BuildingNumber': build_num,
-                'Flat': flat,
-                'Note': note
-            }
-        return cls.send(method='save', method_props=props)
-
-    @classmethod
-    def update(cls, from_data=None, cp_ref=None, add_ref=None, str_ref=None, build_num=None, flat=None, note=None):
-        """
-        Method for updating counterparty's address
-
-        :param from_data:
-            dictionary with all required data, will be used instead of passing each keyword separately
-        :type from_data:
-            dict
-        :param cp_ref:
-            ID of the counterparty
-        :type cp_ref:
-            str or unicode
-        :param add_ref:
-            ID of the address, that need to be updated
-        :type add_ref:
-            str or unicode
-        :param str_ref:
-            ID of the street
-        :type str_ref:
-            str or unicode
-        :param build_num:
-            building number
-        :type build_num:
-            str or unicode
-        :param flat:
-            flat number
-        :type flat:
-            str or unicode
-        :param note:
-            comment
-        :type:
-            str or unicode
-        :return:
-            dictionary with info about saved address
-        :rtype:
-             dict
-        """
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'CounterpartyRef': cp_ref,
-                'Ref': add_ref,
-                'StreetRef': str_ref,
-                'BuildingNumber': build_num,
-                'Flat': flat,
-                'Note': note
-            }
-        return cls.send(method='update', method_props=props)
-
-    @classmethod
-    def delete(cls, add_ref):
-        """
-        Method for deleting saved address
-        :param add_ref:
-            ID of the address, that need to be deleted
-        :type add_ref:
-            str or unicode
-        :return:
-            dict with info about deleted address
-
-        """
-        props = {
-            'Ref': add_ref
-        }
-        return cls.send(method='delete', method_props=props)
+class ContactPerson(BaseActions, Model):
+    """
+    A class representing the `ContactPerson` model of Nova Poshta API.
+    Used for manipulating contact person data.
+    :NOTE: All counterpart details must be only in Ukrainian.
+    """
 
 
-class Counterparty(NovaPoshtaApi):
+class Counterparty(BaseActions, Model):
     """
     A class representing the `Counterparty` model of Nova Poshta API.
     Used for interact with counterpart's info.
     """
     test_url = "Counterparty/{format}/{method}/"
+    object_attrs = {
+        "ContactPerson": ContactPerson,
+    }
+
 
     @classmethod
     def get_counterparties(cls, cp_type='Sender'):
@@ -388,214 +292,6 @@ class Counterparty(NovaPoshtaApi):
         req = cls.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
         return req
 
-    @classmethod
-    def save(cls,  # TODO: Default values!
-             from_data=None,
-             city_ref=None,
-             first_name=None,
-             mid_name=None,
-             last_name=None,
-             phone=None, email=None,
-             cp_type=None,
-             cp_prop=None):
-        """
-        Method for saving counterparty.
-        Named arguments can be used or it is possible to save pre-parsed dictionary with counterparty info.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.save(city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name='Фелікс',``
-            ``mid_name='Едуардович', last_name='Ковальчук', phone='0937979489',``
-            ``email='myemail@my.com', cp_type='PrivatePerson', cp_prop='Recipient')``
-            or:
-            ``counterparty = Counterparty()``
-            ``data = {``
-            ``       'CityRef' : 'db5c88d7-391c-11dd-90d9-001a92567626',``
-            ``       'CounterpartyProperty' : 'Recipient',``
-            ``       'CounterpartyType' : 'PrivatePerson',``
-            ``       'Email' : '',``
-            ``       'FirstName' : 'Андрій',``
-            ``       'LastName' : 'Яковлєв',``
-            ``       'MiddleName' : 'Адуардович',``
-            ``       'Phone' : '0997979789' }``
-            ``counterparty.save(from_data=data)``
-
-        :param from_data:
-            dictionary with all required data, will be used instead of passing each keyword separately
-        :param city_ref:
-            ID of the counterparty's city
-        :type city_ref:
-            str or unicode
-        :param first_name:
-            first name of the counterparty
-        :type:
-            str or unicode
-        :param mid_name:
-            middle name of the counterparty
-        :type:
-            str or unicode
-        :param last_name:
-            last name of the counterparty
-        :type:
-            str or unicode
-        :param phone:
-            phone number of the counterparty
-        :type:
-            str or unicode
-        :param email:
-            e-mail address of the counterparty
-        :type:
-            str or unicode
-        :param cp_type:
-            type of the counterparty (`PrivatePerson` etc.)
-        :type:
-            str or unicode
-        :param cp_prop:
-            counterparty property (can be either `Sender` or `Recipient`)
-        :type:
-            str or unicode
-        :return:
-            dictionary with info about saved counterparty
-        :rtype:
-            dict
-        """
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'CityRef': city_ref,
-                'FirstName': first_name,
-                'MiddleName': mid_name,
-                'LastName': last_name,
-                'Phone': phone,
-                'Email': email,
-                'CounterpartyType': cp_type,
-                'CounterpartyProperty': cp_prop
-            }
-        req = cls.send(method='save', method_props=props)
-        return req
-
-    # TODO: API requires all fields to be passed. Maybe we can pre-fetch data from API and use if no need to update it
-    @classmethod
-    def update(cls,
-               from_data=None,
-               cp_ref=None,
-               city_ref=None,
-               first_name=None,
-               mid_name=None,
-               last_name=None,
-               phone=None,
-               email=None,
-               cp_type=None,
-               cp_prop=None,
-               own_form=None):
-        """
-        Method for updating counterparty. All fields are required
-        Named arguments can be used or it is possible to update pre-parsed dictionary with counterparty info.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.update(ref='db5c88d7-391c-11dd-90d9-001a92567626',``
-            ``city_ref='db5c88d7-391c-11dd-90d9-001a92567626', first_name='Фелікс',``
-            ``mid_name='Едуардович', last_name='Ковальчук', phone='0937979489',``
-            ``email='myemail@my.com', cp_type='PrivatePerson', cp_prop='Recipient', own_form='')``
-            or:
-            ``counterparty = Counterparty()``
-            ``data = {'Ref': 'db5c88d7-391c-11dd-90d9-001a92567626',``
-            ``       'CityRef' : 'db5c88d7-391c-11dd-90d9-001a92567626',``
-            ``       'CounterpartyProperty' : 'Recipient',``
-            ``       'CounterpartyType' : 'PrivatePerson',``
-            ``       'Email' : '',``
-            ``       'FirstName' : 'Андрій',``
-            ``       'LastName' : 'Яковлєв',``
-            ``       'MiddleName' : 'Едуардович',``
-            ``       'Phone' : '0997979789',``
-            ``       'OwnershipForm': '' }``
-            ``counterparty.update(from_data=data)``
-
-        :param from_data:
-            dictionary with all required data, will be used instead of passing each keyword separately
-        :type from_data:
-            dict
-        :param city_ref:
-            ID of the counterparty's city
-        :type city_ref:
-            str or unicode
-        :param first_name:
-            first name of the counterparty
-        :type:
-            str or unicode
-        :param mid_name:
-            middle name of the counterparty
-        :type:
-            str or unicode
-        :param last_name:
-            last name of the counterparty
-        :type:
-            str or unicode
-        :param phone:
-            phone number of the counterparty
-        :type:
-            str or unicode
-        :param email:
-            e-mail address of the counterparty
-        :type:
-            str or unicode
-        :param cp_type:
-            type of the counterparty (`PrivatePerson` etc.)
-        :type:
-            str or unicode
-        :param cp_prop:
-            counterparty property (can be either `Sender` or `Recipient`)
-        :type:
-            str or unicode
-        :param own_form:
-            ownership form of the counterparty.
-            if needed, `get_ownership_forms_list`method from Common class can be used to get possible values
-        :type own_form:
-            str or unicode
-        :return:
-            dictionary with info about saved counterparty
-        :rtype:
-            dict
-        """
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'Ref': cp_ref,
-                'CityRef': city_ref,
-                'FirstName': first_name,
-                'MiddleName': mid_name,
-                'LastName': last_name,
-                'Phone': phone,
-                'Email': email,
-                'CounterpartyType': cp_type,
-                'CounterpartyProperty': cp_prop,
-                'OwnershipForm': own_form
-            }
-        req = cls.send(method='update', method_props=props)
-        return req
-
-    @classmethod
-    def delete(cls, cp_ref):
-        """
-        Method for deleting counterparties.
-        Due to restrictions, only `Recipient` counterparty type can be deleted.
-
-        :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.delete('342e8add-6953-11e5-ad08-005056801333')``
-        :param cp_ref:
-            ID of the counterparty
-        :type cp_ref:
-            str or unicode
-        :return:
-            dictionary with ID of deleted counterparty
-        """
-        req = cls.send(method='delete', method_props={'Ref': cp_ref})
-        return req
-
     # @classmethod
     #def save_third_person(cls):
     #     """Not implemented due to contract lack, will be here in the future. Maybe :)"""
@@ -620,7 +316,7 @@ class Counterparty(NovaPoshtaApi):
         return req
 
 
-class Common(NovaPoshtaApi):
+class Common(Model):
     """A class representing the `Common` model of Nova Poshta API.
     Used for parsing common (obviously) information, which represents different data (cargo, payment etc.).
     """
@@ -688,40 +384,23 @@ class Common(NovaPoshtaApi):
         return req
 
     @classmethod
-    def get_cargo_description_list(cls):
+    def get_cargo_description_list(cls, q):
         """
         Method for fetching the directory of cargo description.
 
         :example:
-            ``common = Common()``
-            ``common.get_cargo_description_list()``
-        :return:
-            dictionary with cargo descriptions
-        :rtype:
-            dict
-        """
-        req = cls.send(method='getCargoDescriptionList')
-        return req
-
-    @classmethod
-    def search_cargo_description_list(cls, keyword):
-        """
-        Method for fetching cargo description by keyword.
-        In general, it is extended version of `get_cargo_description_list` with `FindByString` API's methods param.
-        :example:
-            ``common = Common()``
-            ``common.search_cargo_description_list('Абажур')``
-        :param keyword:
+            ``Common.get_cargo_description_list()``
+            ``Common.get_cargo_description_list("Абажур")``
+        :param q:
             keyword for searching
-        :type keyword:
-            str or unicode
         :return:
-            dictionary with cargo descriptions
+            list(Common objects)
         :rtype:
-            dict
+            list
         """
-        req = cls.send(method='getCargoDescriptionList', method_props={'FindByString': keyword})
-        return req
+        props = {'FindByString': q} if q else {}
+        return cls.send(method='getCargoDescriptionList', method_props=props)
+
 
     @classmethod
     def get_ownership_forms_list(cls):
@@ -910,53 +589,7 @@ class Common(NovaPoshtaApi):
         return req
 
 
-class ContactPerson(NovaPoshtaApi):
-    """A class representing the `ContactPerson` model of Nova Poshta API.
-    Used for manipulating contact person data.
-    :NOTE: All counterpart details must be only in Ukrainian.
-    """
-
-    @classmethod
-    def save(cls, cp_ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'CounterpartyRef': cp_ref,
-                'FirstName': first_name,
-                'LastName': last_name,
-                'MiddleName': mid_name,
-                'Phone': phone,
-            }
-        req = cls.send(method='save', method_props=props)
-        return req
-
-    @classmethod
-    def update(cls, cp_ref=None, ref=None, from_data=None, first_name=None, mid_name=None, last_name=None, phone=None):
-        if from_data:
-            props = from_data
-        else:
-            props = {
-                'CounterpartyRef': cp_ref,
-                'Ref': ref,
-                'FirstName': first_name,
-                'LastName': last_name,
-                'MiddleName': mid_name,
-                'Phone': phone,
-            }
-        req = cls.send(method='update', method_props=props)
-        return req
-
-    @classmethod
-    def delete(cls, cp_ref=None):
-        props = {
-            'Ref': cp_ref
-        }
-        req = cls.send(method='delete', method_props=props)
-        return req
-
-
-class InternetDocument(NovaPoshtaApi):
+class InternetDocument(BaseActions, Model):
     test_url="en/{method}/{format}/"
 
     @classmethod
@@ -965,12 +598,3 @@ class InternetDocument(NovaPoshtaApi):
             method='getDocumentList', method_props=kwargs,
             test_url="en/{format}/{method}/",
         )
-
-    @classmethod
-    def save(cls, **kwargs):
-        return cls.send(method="save", method_props=kwargs)
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
