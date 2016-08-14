@@ -2,6 +2,9 @@
 python -m novaposhta.tests
 python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
+import sys
+sys.setrecursionlimit(140)
+
 import unittest
 import logging
 

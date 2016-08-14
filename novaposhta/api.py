@@ -17,18 +17,28 @@ class NovaPoshta(object):
     A base API class, that holds shared methods and settings for other models.
     Creates basic query object and provide `apiKey` and API endpoint configuration.
     """
+    _registered_models = {}
+
     api_key  = attr.ib(default=conf.API_KEY)
     endpoint = attr.ib(default=conf.API_ENDPOINT)
 
     def __getattr__(self, key):
-        model = self._registered_models[key]
-        model.api = self
-        setattr(self, key, model)
-        return model
+        if key[0].isupper():
+            model = self._registered_models[key]
+            model.api = self
+            setattr(self, key, model)
+            return model
+        raise AttributeError
 
     @classmethod
     def model(cls, decorated_class):
         cls._registered_models[decorated_class.__name__] = decorated_class
+
+    @property
+    def session(self):
+        if not hasattr(self, "_session"):
+            self._session = requests.Session()
+        return self._session
 
     def send(self, url, model_name, method, method_props=None):
         """
@@ -57,7 +67,7 @@ class NovaPoshta(object):
         }
 
         logger.debug("send: %s\n%s", url, _safe_query_for_logging(**query))
-        resp = requests.post(url, json.dumps(query, default=serializer.encoder))
+        resp = self.session.post(url, json.dumps(query, default=serializer.encoder))
         resp = resp.json()
         logger.debug("received:\n%s", _truncate(json.dumps(resp, indent=2, ensure_ascii=False)))
         if resp["warnings"]:
