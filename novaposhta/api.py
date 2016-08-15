@@ -33,6 +33,7 @@ class NovaPoshta(object):
     @classmethod
     def model(cls, decorated_class):
         cls._registered_models[decorated_class.__name__] = decorated_class
+        return decorated_class
 
     @property
     def session(self):
