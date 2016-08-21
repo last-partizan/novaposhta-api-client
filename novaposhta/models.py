@@ -388,7 +388,7 @@ class Common(Model):
         return req
 
     @classmethod
-    def get_cargo_description_list(cls, q):
+    def get_cargo_description_list(cls, q=None):
         """
         Method for fetching the directory of cargo description.
 
