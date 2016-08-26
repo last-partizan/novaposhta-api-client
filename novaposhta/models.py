@@ -1,4 +1,7 @@
 # coding: utf-8
+from datetime import datetime
+import attr
+
 from .api import NovaPoshta
 
 
@@ -11,6 +14,7 @@ class Model(object):
     api = NovaPoshta()
 
     object_attrs = {}
+    result_cls = {}
 
     def __init__(self, **params):
         for k, v in self.object_attrs.items():
@@ -39,10 +43,15 @@ class Model(object):
             cls.api.build_url(cls, method, test_url or cls.test_url),
             cls.__name__, method, method_props
         )
+        result_cls = cls.get_result_cls(method)
         if isinstance(raw, dict):
-            return cls(**raw)
+            return result_cls(**raw)
         else:
-            return [cls(**attrs) for attrs in raw]
+            return [result_cls(**attrs) for attrs in raw]
+
+    @classmethod
+    def get_result_cls(cls, method):
+        return cls.result_cls.get(method, cls)
 
 
 class BaseActions(object):
@@ -593,9 +602,23 @@ class Common(Model):
         return req
 
 
+@attr.s
+class SavedDocument(object):
+    Ref = attr.ib()
+    IntDocNumber = attr.ib()
+    TypeDocument = attr.ib()
+    CostOnSite = attr.ib(convert=float)
+    EstimatedDeliveryDate = attr.ib(
+        convert=lambda v: datetime.strptime(v, "%d.%m.%Y"),
+    )
+
+
 @NovaPoshta.model
 class InternetDocument(BaseActions, Model):
     test_url="en/{method}/{format}/"
+    result_cls = {
+        "save": SavedDocument,
+    }
 
     @classmethod
     def get_document_list(cls, **kwargs):
