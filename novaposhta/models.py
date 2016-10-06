@@ -626,3 +626,22 @@ class InternetDocument(BaseActions, Model):
             method='getDocumentList', method_props=kwargs,
             test_url="en/{format}/{method}/",
         )
+
+
+@NovaPoshta.model
+class TrackingDocument(Model):
+
+    @classmethod
+    def get_status_documents(cls, documents, language="UA"):
+        return cls.send(
+            method='getStatusDocuments', method_props={
+                'Documents': list(map(cls._prepare_doc, documents)),
+                'Language': language,
+            },
+        )
+
+    @classmethod
+    def _prepare_doc(cls, obj):
+        if isinstance(obj, tuple):
+            return dict(zip(["DocumentNumber", "Phone"], obj))
+        return obj

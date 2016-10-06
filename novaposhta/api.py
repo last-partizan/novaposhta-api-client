@@ -39,6 +39,9 @@ class NovaPoshta(object):
     def session(self):
         if not hasattr(self, "_session"):
             self._session = requests.Session()
+            self._session.headers.update({
+                "Content-Type": "application/json",
+            })
         return self._session
 
     def send(self, url, model_name, method, method_props=None):
@@ -69,8 +72,10 @@ class NovaPoshta(object):
 
         logger.debug("send: %s\n%s", url, _safe_query_for_logging(**query))
         resp = self.session.post(url, json.dumps(query, default=serializer.encoder))
+        resp.raise_for_status()
         resp = resp.json()
         logger.debug("received:\n%s", _truncate(json.dumps(resp, indent=2, ensure_ascii=False)))
+
         if resp["warnings"]:
             logger.warning(
                 "Api returned warning list:\n%s",
@@ -103,7 +108,7 @@ def _safe_query_for_logging(**q):
 
 def _truncate(string, l=500):
     if len(string) > 500:
-        return string[:500] + "..."
+        return "%s..." % string[:500]
     return string
 
 def _clean_properties(method_properties):
