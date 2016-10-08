@@ -2,7 +2,7 @@
 import attr
 
 from .api import NovaPoshta
-from .serializer import parse_date, parse_datetime
+from .serializer import parse_date, parse_date_dot, parse_datetime
 
 
 class Model(object):
@@ -13,16 +13,21 @@ class Model(object):
     test_url = "{format}/{cls}/{method}/"
     api = NovaPoshta()
 
-    object_attrs = {}
+    convert_attrs = {}
     result_cls = {}
 
     def __init__(self, **params):
-        for k, v in self.object_attrs.items():
+        for k, f in self.convert_attrs.items():
             try:
-                params[k] = v(**params[k]['data'][0])
+                params[k] = f(params[k])
             except KeyError:
                 pass
+
         self.__dict__.update(params)
+
+    @property
+    def data(self):
+        return self.__dict__
 
     def __repr__(self):
         return "<{}: {}>".format(self.__class__.__name__, str(self))
@@ -184,8 +189,8 @@ class Counterparty(BaseActions, Model):
     Used for interact with counterpart's info.
     """
     test_url = "Counterparty/{format}/{method}/"
-    object_attrs = {
-        "ContactPerson": ContactPerson,
+    convert_attrs = {
+        "ContactPerson": lambda data: ContactPerson(**data['data'][0]),
     }
 
 
@@ -604,7 +609,7 @@ class SavedDocument(object):
     IntDocNumber = attr.ib()
     TypeDocument = attr.ib()
     CostOnSite = attr.ib(convert=float)
-    EstimatedDeliveryDate = attr.ib(convert=parse_date)
+    EstimatedDeliveryDate = attr.ib(convert=parse_date_dot)
 
 
 @NovaPoshta.model
@@ -625,11 +630,9 @@ class InternetDocument(BaseActions, Model):
 @NovaPoshta.model
 class TrackingDocument(Model):
 
-    object_attrs = {
+    convert_attrs = {
         "RecipientDateTime": parse_datetime,
         "ScheduledDeliveryDate": parse_date,
-        "DateCreated": parse_datetime,
-        "DateScan": parse_datetime,
     }
 
     @classmethod
