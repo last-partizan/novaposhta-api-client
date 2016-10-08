@@ -1,8 +1,8 @@
 # coding: utf-8
-from datetime import datetime
 import attr
 
 from .api import NovaPoshta
+from .serializer import parse_date, parse_datetime
 
 
 class Model(object):
@@ -23,10 +23,6 @@ class Model(object):
             except KeyError:
                 pass
         self.__dict__.update(params)
-
-    @property
-    def data(self):
-        return self.__dict__
 
     def __repr__(self):
         return "<{}: {}>".format(self.__class__.__name__, str(self))
@@ -608,9 +604,7 @@ class SavedDocument(object):
     IntDocNumber = attr.ib()
     TypeDocument = attr.ib()
     CostOnSite = attr.ib(convert=float)
-    EstimatedDeliveryDate = attr.ib(
-        convert=lambda v: datetime.strptime(v, "%d.%m.%Y"),
-    )
+    EstimatedDeliveryDate = attr.ib(convert=parse_date)
 
 
 @NovaPoshta.model
@@ -630,6 +624,13 @@ class InternetDocument(BaseActions, Model):
 
 @NovaPoshta.model
 class TrackingDocument(Model):
+
+    object_attrs = {
+        "RecipientDateTime": parse_datetime,
+        "ScheduledDeliveryDate": parse_date,
+        "DateCreated": parse_datetime,
+        "DateScan": parse_datetime,
+    }
 
     @classmethod
     def get_status_documents(cls, documents, language="UA"):
