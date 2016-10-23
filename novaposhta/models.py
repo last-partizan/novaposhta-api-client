@@ -20,7 +20,7 @@ class Model(object):
         for k, f in self.convert_attrs.items():
             try:
                 params[k] = f(params[k])
-            except KeyError:
+            except (KeyError, IndexError):
                 pass
 
         self.__dict__.update(params)
