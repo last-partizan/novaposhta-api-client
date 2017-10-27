@@ -46,16 +46,19 @@ class Model(object):
         )
         result_cls = cls.get_result_cls(method)
 
-        def convert(attrs):
+        def convert(data):
             try:
-                return result_cls(**raw)
+                return result_cls(**data)
             except TypeError:
-                return result_cls(**{k: v for k, v in raw.items() if hasattr(result_cls, k)})
+                return result_cls(**{
+                    k: v
+                    for k, v in data.items() if hasattr(result_cls, k)
+                })
 
         if isinstance(raw, dict):
-            return convert(**raw)
+            return convert(raw)
         else:
-            return [convert(**attrs) for attrs in raw]
+            return [convert(attrs) for attrs in raw]
 
     @classmethod
     def get_result_cls(cls, method):
