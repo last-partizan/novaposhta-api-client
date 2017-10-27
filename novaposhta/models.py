@@ -45,10 +45,17 @@ class Model(object):
             cls.__name__, method, method_props
         )
         result_cls = cls.get_result_cls(method)
+
+        def convert(attrs):
+            try:
+                return result_cls(**raw)
+            except TypeError:
+                return result_cls(**{k: v for k, v in raw.items() if hasattr(result_cls, k)})
+
         if isinstance(raw, dict):
-            return result_cls(**raw)
+            return convert(**raw)
         else:
-            return [result_cls(**attrs) for attrs in raw]
+            return [convert(**attrs) for attrs in raw]
 
     @classmethod
     def get_result_cls(cls, method):
