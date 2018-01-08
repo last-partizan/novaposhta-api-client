@@ -203,7 +203,6 @@ class Counterparty(BaseActions, Model):
         "ContactPerson": lambda data: ContactPerson(**data['data'][0]),
     }
 
-
     @classmethod
     def get_counterparties(cls, cp_type='Sender'):
         """
@@ -222,7 +221,7 @@ class Counterparty(BaseActions, Model):
             dict
         """
         return cls.send(method='getCounterparties',
-                         method_props={"CounterpartyProperty": cp_type})
+                        method_props={"CounterpartyProperty": cp_type})
 
     @classmethod
     def get_counterparty_by_name(cls, name, cp_type='Sender'):
@@ -246,7 +245,7 @@ class Counterparty(BaseActions, Model):
             dict
         """
         req = cls.send(method='getCounterparties',
-                        method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
+                       method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
         return req
 
     @classmethod
@@ -294,7 +293,7 @@ class Counterparty(BaseActions, Model):
             dictionary with info about counterparty's addresses
         """
         req = cls.send(method='getCounterpartyAddresses',
-                        method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
+                       method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
         return req
 
     @classmethod
@@ -316,7 +315,7 @@ class Counterparty(BaseActions, Model):
         return req
 
     # @classmethod
-    #def save_third_person(cls):
+    # def save_third_person(cls):
     #     """Not implemented due to contract lack, will be here in the future. Maybe :)"""
     #     return False
 
@@ -424,7 +423,6 @@ class Common(Model):
         """
         props = {'FindByString': q} if q else {}
         return cls.send(method='getCargoDescriptionList', method_props=props)
-
 
     @classmethod
     def get_ownership_forms_list(cls):
@@ -624,7 +622,7 @@ class SavedDocument(object):
 
 @NovaPoshta.model
 class InternetDocument(BaseActions, Model):
-    test_url="en/{method}/{format}/"
+    test_url = "en/{method}/{format}/"
     result_cls = {
         "save": SavedDocument,
     }
