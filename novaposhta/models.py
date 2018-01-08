@@ -85,7 +85,7 @@ class Address(BaseActions, Model):
     """A class representing the `Address` model of Nova Poshta API.
     Used for parsing `geodata` (like cities, streets etc.).
     """
-    test_url="{format}/Address/{method}"
+    test_url = "{format}/Address/{method}"
 
     @classmethod
     def get_cities(cls, find=None):
