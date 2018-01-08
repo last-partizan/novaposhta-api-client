@@ -50,9 +50,10 @@ class Model(object):
             try:
                 return result_cls(**data)
             except TypeError:
+                fields = [f.name for f in attr.fields(result_cls)]
                 return result_cls(**{
                     k: v
-                    for k, v in data.items() if hasattr(result_cls, k)
+                    for k, v in data.items() if k in fields
                 })
 
         if isinstance(raw, dict):
