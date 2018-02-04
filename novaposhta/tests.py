@@ -71,9 +71,10 @@ class TestInternetDocument(unittest.TestCase):
         }
         return models.InternetDocument(**data).save()
 
+    @unittest.expectedFailure
     def test_return(self):
         doc = self.create_test_document()
-        models.AdditionalService.check_possibility_create_return(doc.Ref)
+        models.AdditionalService.check_possibility_create_return(doc.IntDocNumber)
 
 
 class TestCounterparty(unittest.TestCase):

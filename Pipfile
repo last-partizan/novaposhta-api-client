@@ -12,3 +12,6 @@ requests = "*"
 
 
 [dev-packages]
+
+ipython = "*"
+ipdb = "*"
