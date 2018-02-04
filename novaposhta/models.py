@@ -664,7 +664,7 @@ class TrackingDocument(Model):
 class AdditionalService(Model):
 
     @classmethod
-    def CheckPossibilityCreateReturn(cls, ref):
+    def check_possibility_create_return(cls, ref):
         return cls.send(
             method='CheckPossibilityCreateReturn', method_props={
                 'Number': ref,

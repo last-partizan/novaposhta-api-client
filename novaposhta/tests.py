@@ -4,38 +4,76 @@ python -m novaposhta.tests
 python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
 import sys
+from datetime import datetime
 
 import unittest
 import logging
 
-from novaposhta.models import Model, Address, InternetDocument, Counterparty, ContactPerson
+from novaposhta import models
 
 
 def setUpModule():
     sys.setrecursionlimit(140)
-    if not Model.api.api_key:
+    if not models.Model.api.api_key:
         raise RuntimeError("NOVAPOSHTA_API_KEY env is not set")
-    print("Using NOVAPOSHTA_API_KEY='%s'" % Model.api.api_key)
+    print("Using NOVAPOSHTA_API_KEY='%s'" % models.Model.api.api_key)
 
 
 class TestAddress(unittest.TestCase):
 
     def test_get_cities(self):
-        self.assertIsInstance(Address.get_cities(), list)
-        self.assertIsInstance(Address.get_cities(find='Здолбунів'), list)
+        self.assertIsInstance(models.Address.get_cities(), list)
+        self.assertIsInstance(models.Address.get_cities(find='Здолбунів'), list)
 
 
 class TestInternetDocument(unittest.TestCase):
 
     def test_get_document_list(self):
-        self.assertIsInstance(InternetDocument.get_document_list(), list)
+        self.assertIsInstance(models.InternetDocument.get_document_list(), list)
 
-    def notest_save(self):
-        InternetDocument.save()
+    def create_recipient(self):
+        return models.Counterparty(**{
+            "CityRef": "db5c88d7-391c-11dd-90d9-001a92567626",
+            "CounterpartyProperty": "Recipient",
+            "CounterpartyType": "PrivatePerson",
+            "FirstName": "Тест",
+            "LastName": "Тест",
+            "Phone": "380631112223",
+        }).save()
+
+    def create_test_document(self):
+        cp = models.Counterparty.get_counterparties()[0]
+        contact = models.Counterparty.get_counterparty_contact_persons(cp.Ref)[0]
+        recipient = self.create_recipient()
+        data = {
+            "PayerType": "Sender",
+            "PaymentMethod": "Cash",
+            "DateTime": datetime.now().strftime("%d.%m.%Y"),
+            "CargoType": "Cargo",
+            "VolumeGeneral": "0.1",
+            "Weight": "10",
+            "ServiceType": "WarehouseDoors",
+            "SeatsAmount": "1",
+            "Description": "абажур",
+            "Cost": "500",
+
+            "CitySender": "8d5a980d-391c-11dd-90d9-001a92567626",
+            "Sender": cp.Ref,
+            "SenderAddress": "01ae2635-e1c2-11e3-8c4a-0050568002cf",
+            "ContactSender": contact.Ref,
+            "SendersPhone": "380678734567",
+
+            "CityRecipient": "db5c8892-391c-11dd-90d9-001a92567626",
+            "Recipient": recipient.Ref,
+            "RecipientAddress": "511fcfbd-e1c2-11e3-8c4a-0050568002cf",
+            "ContactRecipient": recipient.ContactPerson.Ref,
+            "RecipientsPhone": "380631112223"
+        }
+        return models.InternetDocument(**data).save()
 
     def test_return(self):
-        docs = InternetDocument.get_document_list()
-        print(docs)
+        doc = self.create_test_document()
+        models.AdditionalService.check_possibility_create_return(doc.Ref)
 
 
 class TestCounterparty(unittest.TestCase):
@@ -51,12 +89,12 @@ class TestCounterparty(unittest.TestCase):
     }
 
     def test_get_counterparties(self):
-        self.assertIsInstance(Counterparty.get_counterparties(), list)
+        self.assertIsInstance(models.Counterparty.get_counterparties(), list)
 
     def test_save(self):
-        cp = Counterparty(**self.data).save()
-        self.assertIsInstance(cp, Counterparty)
-        self.assertIsInstance(cp.ContactPerson, ContactPerson)
+        cp = models.Counterparty(**self.data).save()
+        self.assertIsInstance(cp, models.Counterparty)
+        self.assertIsInstance(cp.ContactPerson, models.ContactPerson)
 
 
 if __name__ == '__main__':
