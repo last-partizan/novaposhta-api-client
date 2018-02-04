@@ -1,14 +1,22 @@
 """
+NOVAPOSHTA_API_KEY = "your test api key"
 python -m novaposhta.tests
 python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
 import sys
-sys.setrecursionlimit(140)
 
 import unittest
 import logging
 
-from novaposhta.models import Address, InternetDocument, Counterparty, ContactPerson
+from novaposhta.models import Model, Address, InternetDocument, Counterparty, ContactPerson
+
+
+def setUpModule():
+    sys.setrecursionlimit(140)
+    if not Model.api.api_key:
+        raise RuntimeError("NOVAPOSHTA_API_KEY env is not set")
+    print("Using NOVAPOSHTA_API_KEY='%s'" % Model.api.api_key)
+
 
 class TestAddress(unittest.TestCase):
 
@@ -24,6 +32,10 @@ class TestInternetDocument(unittest.TestCase):
 
     def notest_save(self):
         InternetDocument.save()
+
+    def test_return(self):
+        docs = InternetDocument.get_document_list()
+        print(docs)
 
 
 class TestCounterparty(unittest.TestCase):

@@ -99,6 +99,7 @@ class NovaPoshta(object):
             )
         return endpoint
 
+
 def _safe_query_for_logging(**q):
     if q["apiKey"]:
         q["apiKey"] = "*" * len(q["apiKey"])
@@ -106,10 +107,12 @@ def _safe_query_for_logging(**q):
         q, indent=2, ensure_ascii=False, default=serializer.encoder,
     )
 
+
 def _truncate(string, l=500):
     if len(string) > 500:
         return "%s..." % string[:500]
     return string
+
 
 def _clean_properties(method_properties):
     return dict((k, v) for k, v in method_properties.items() if v)

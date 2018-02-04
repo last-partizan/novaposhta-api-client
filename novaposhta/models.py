@@ -658,3 +658,15 @@ class TrackingDocument(Model):
         if isinstance(obj, tuple):
             return dict(zip(["DocumentNumber", "Phone"], obj))
         return obj
+
+
+@NovaPoshta.model
+class AdditionalService(Model):
+
+    @classmethod
+    def CheckPossibilityCreateReturn(cls, ref):
+        return cls.send(
+            method='CheckPossibilityCreateReturn', method_props={
+                'Number': ref,
+            },
+        )
