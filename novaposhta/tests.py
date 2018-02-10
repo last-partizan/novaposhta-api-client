@@ -74,8 +74,6 @@ class TestAdditionalService(unittest.TestCase):
         }
         return models.InternetDocument(**data).save()
 
-
-
     @unittest.expectedFailure
     def test_return(self):
         doc = self.create_test_document()
