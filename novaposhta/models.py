@@ -634,6 +634,13 @@ class AdditionalService(BaseActions, Model):
     Возврат посылок
     https://devcenter.novaposhta.ua/docs/services/58ad7185eea27006cc36d649/operations/58b6cd6aeea2700d141ccae1
     """
+    IntDocNumber = attr.ib()
+    PaymentMethod = attr.ib()
+    Reason = attr.ib()
+    SubtypeReason = attr.ib()
+    Note = attr.ib(default="")
+    OrderType = attr.ib(default="orderCargoReturn")
+    ReturnAddressRef = attr.ib()
 
     @classmethod
     def check_possibility_create_return(cls, ref):
