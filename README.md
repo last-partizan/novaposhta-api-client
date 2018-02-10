@@ -7,7 +7,7 @@ Python client for Nova Poshta company's API.
 
 #### Environment variables
 
-If not using django, set `NOVAPOSHTA_API_KEY` and `NOVAPOSHTA_API_POINT` (not required)
+If not using django, set `NOVAPOSHTA_API_KEY` and `NOVAPOSHTA_API_POINT` (optional)
 
 
 #### Django
@@ -22,6 +22,9 @@ NOVAPOSHTA_API_SETTINGS = {
 
 ## Testing
 
-Using doctest module
-
-python -m novaposhta.models
+```
+# install deps and enable virtualenv
+pipenv shell
+# run tests
+python setup.py test
+```

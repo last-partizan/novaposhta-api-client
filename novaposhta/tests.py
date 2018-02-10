@@ -71,10 +71,27 @@ class TestInternetDocument(unittest.TestCase):
         }
         return models.InternetDocument(**data).save()
 
+
+class TestAdditionalService(unittest.TestCase):
+
     @unittest.expectedFailure
     def test_return(self):
         doc = self.create_test_document()
         models.AdditionalService.check_possibility_create_return(doc.IntDocNumber)
+
+    def test_get_return_reasons(self):
+        reasons = models.AdditionalService.get_return_reasons()
+        self.assertGreaterEqual(len(reasons), 1)
+        subtypes = models.AdditionalService.get_return_reason_subtypes(
+            reasons[0].Ref,
+        )
+        self.assertGreaterEqual(len(subtypes), 1)
+
+    def test_get_return_orders_list(self):
+        self.assertIsInstance(
+            models.AdditionalService.get_return_orders_list(),
+            list,
+        )
 
 
 class TestCounterparty(unittest.TestCase):

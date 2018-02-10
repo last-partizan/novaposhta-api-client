@@ -39,7 +39,7 @@ class Model(object):
             return "{} object".format(self.__class__.__name__)
 
     @classmethod
-    def send(cls, method, method_props, test_url=None, raw=False):
+    def send(cls, method, method_props=None, test_url=None, raw=False):
         raw = cls.api.send(
             cls.api.build_url(cls, method, test_url or cls.test_url),
             cls.__name__, method, method_props
@@ -661,7 +661,11 @@ class TrackingDocument(Model):
 
 
 @NovaPoshta.model
-class AdditionalService(Model):
+class AdditionalService(BaseActions, Model):
+    """
+    Возврат посылок
+    https://devcenter.novaposhta.ua/docs/services/58ad7185eea27006cc36d649/operations/58b6cd6aeea2700d141ccae1
+    """
 
     @classmethod
     def check_possibility_create_return(cls, ref):
@@ -670,3 +674,21 @@ class AdditionalService(Model):
                 'Number': ref,
             },
         )
+
+    @classmethod
+    def get_return_reasons(cls):
+        return cls.send(
+            method='getReturnReasons',
+        )
+
+    @classmethod
+    def get_return_reason_subtypes(cls, ref):
+        return cls.send(
+            method='getReturnReasonsSubtypes', method_props={
+                'ReasonRef': ref,
+            }
+        )
+
+    @classmethod
+    def get_return_orders_list(cls, **kwargs):
+        return cls.send(method='getReturnOrdersList', method_props=kwargs)
