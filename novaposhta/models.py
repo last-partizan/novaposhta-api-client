@@ -94,9 +94,8 @@ class Address(BaseActions, Model):
         Method for fetching info about all cities.
 
         :example:
-            ``address = Address()``
-            ``address.get_cities()``
-            ``address.get_cities(find='Здолбунів')``
+            ``Address.get_cities()``
+            ``Address.get_cities(find='Здолбунів')``
         :return:
             list(dictionary)
         :rtype:
@@ -110,9 +109,8 @@ class Address(BaseActions, Model):
         Method for fetching info about streets in desired city.
 
         :example:
-            ``address = Address()``
-            ``address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698')``
-            ``address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698', find='Незалежності')``
+            ``Address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698')``
+            ``Address.get_streets(city_ref='0006560c-4079-11de-b509-001d92f78698', find='Незалежності')``
         :param city_ref:
             ID of the target city
         :type city_ref:
@@ -137,8 +135,7 @@ class Address(BaseActions, Model):
         Method for fetching info about all warehouses in desired city.
 
         :example:
-            ``address = Address()``
-            ``address.get_warehouses(city='0006560c-4079-11de-b509-001d92f78698')``
+            ``Address.get_warehouses(city='0006560c-4079-11de-b509-001d92f78698')``
         :param city_ref:
             ID of the target city
         :type city_ref:
@@ -159,8 +156,7 @@ class Address(BaseActions, Model):
         Method for fetching info about warehouse's types.
 
         :example:
-            ``address = Address()``
-            ``address.get_warehouse_types()``
+            ``Address.get_warehouse_types()``
         :return:
             parsed dictionary with info about warehouse's types
         :rtype:
@@ -174,8 +170,7 @@ class Address(BaseActions, Model):
         Method for fetching info about areas geographical areas.
 
         :example:
-            ``address = Address()``
-            ``address.get_areas()``
+            ``Address.get_areas()``
         :return:
             parsed dictionary with info about areas
         :rtype:
@@ -210,8 +205,7 @@ class Counterparty(BaseActions, Model):
         Method for fetching all information about counterparties.
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparties(cp_type='Recipient')``
+            ``Counterparty.get_counterparties(cp_type='Recipient')``
         :param cp_type:
             type of the counterparty: can be either `Sender` or `Recipient` (`Sender` used as default)
         :type cp_type:
@@ -230,8 +224,7 @@ class Counterparty(BaseActions, Model):
         Method for fetching info about counterparty by name.
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparties(name='Талісман', cp_type='Recipient')``
+            ``Counterparty.get_counterparties(name='Талісман', cp_type='Recipient')``
         :param name:
             name of the desired counterparty
         :type name:
@@ -245,9 +238,8 @@ class Counterparty(BaseActions, Model):
         :rtype:
             dict
         """
-        req = cls.send(method='getCounterparties',
-                       method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
-        return req
+        return cls.send(method='getCounterparties',
+                        method_props={"CounterpartyProperty": cp_type, 'FindByString': name})
 
     @classmethod
     def get_counterparty_by_edrpou(cls, city_ref, code):
@@ -256,8 +248,7 @@ class Counterparty(BaseActions, Model):
         of Ukrainian Enterprises and Organizations (8-digit code).
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_by_edrpou(city_ref='0006560c-4079-11de-b509-001d92f78698', code='12345678')``
+            ``Counterparty.get_counterparty_by_edrpou(city_ref='0006560c-4079-11de-b509-001d92f78698', code='12345678')``
         :param city_ref:
             ID of the city of counterparty
         :type city_ref:
@@ -271,8 +262,7 @@ class Counterparty(BaseActions, Model):
         :rtype:
             dict
         """
-        req = cls.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
-        return req
+        return cls.send(method='getCounterpartyByEDRPOU', method_props={"CityRef": city_ref, 'EDRPOU': code})
 
     @classmethod
     def get_counterparty_addresses(cls, cp_ref, cp_type='Sender'):
@@ -280,8 +270,7 @@ class Counterparty(BaseActions, Model):
         Method for fetching counterparty's addresses.
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_addresses('f70f1bee-55fd-11e5-8d8d-005056887b8d', cp_type='Recipient')``
+            ``Counterparty.get_counterparty_addresses('f70f1bee-55fd-11e5-8d8d-005056887b8d', cp_type='Recipient')``
         :param cp_ref:
             ID of the counterparty
         :type cp_ref:
@@ -293,9 +282,8 @@ class Counterparty(BaseActions, Model):
         :return:
             dictionary with info about counterparty's addresses
         """
-        req = cls.send(method='getCounterpartyAddresses',
-                       method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
-        return req
+        return cls.send(method='getCounterpartyAddresses',
+                        method_props={'Ref': cp_ref, 'CounterpartyProperty': cp_type})
 
     @classmethod
     def get_counterparty_contact_persons(cls, cp_ref):
@@ -303,8 +291,7 @@ class Counterparty(BaseActions, Model):
         Method for fetching info about counterparty's contact persons.
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_contact_persons('f70f1bee-55fd-11e5-8d8d-005056887b8d')``
+            ``Counterparty.get_counterparty_contact_persons('f70f1bee-55fd-11e5-8d8d-005056887b8d')``
         :param cp_ref:
             name of the counterparty
         :type cp_ref:
@@ -312,8 +299,7 @@ class Counterparty(BaseActions, Model):
         :return:
             dictionary with info about counterparty's contact persons
         """
-        req = cls.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
-        return req
+        return cls.send(method='getCounterpartyContactPersons', method_props={'Ref': cp_ref})
 
     # @classmethod
     # def save_third_person(cls):
@@ -326,8 +312,7 @@ class Counterparty(BaseActions, Model):
         Method for getting counterparties options.
 
         :example:
-            ``counterparty = Counterparty()``
-            ``counterparty.get_counterparty_options('342e8add-6953-11e5-ad08-005056801333')``
+            ``Counterparty.get_counterparty_options('342e8add-6953-11e5-ad08-005056801333')``
         :param cp_ref:
             ID of the counterparty
         :type:
@@ -335,8 +320,7 @@ class Counterparty(BaseActions, Model):
         :return:
             dictionary with counterparty's options
         """
-        req = cls.send(method='getCounterpartyOptions', method_props={'Ref': cp_ref})
-        return req
+        return cls.send(method='getCounterpartyOptions', method_props={'Ref': cp_ref})
 
 
 @NovaPoshta.model
@@ -351,13 +335,11 @@ class Common(Model):
         Method for fetching info about types of payers.
 
         :example:
-            ``common = Common()``
-            ``common.get_types_of_payers()``
+            ``Common.get_types_of_payers()``
         :return:
             dictionary with info about types of payers
         """
-        req = cls.send(method='getTypesOfPayers')
-        return req
+        return cls.send(method='getTypesOfPayers')
 
     @classmethod
     def get_payment_forms(cls):
@@ -365,15 +347,13 @@ class Common(Model):
         Method for fetching info about possible payment forms.
 
         :example:
-            ``common = Common()``
-            ``common.get_payment_forms()``
+            ``Common.get_payment_forms()``
         :return:
             dictionary with info about payment forms
         :rtype:
             dict
         """
-        req = cls.send(method='getPaymentForms')
-        return req
+        return cls.send(method='getPaymentForms')
 
     @classmethod
     def get_cargo_types(cls):
@@ -381,15 +361,13 @@ class Common(Model):
         Method for fetching info about cargo types.
 
         :example:
-            ``common = Common()``
-            ``common.get_cargo_types()``
+            ``Common.get_cargo_types()``
         :return:
             dictionary with info about cargo types
         :rtype:
             dict
         """
-        req = cls.send(method='getCargoTypes')
-        return req
+        return cls.send(method='getCargoTypes')
 
     @classmethod
     def get_service_types(cls):
@@ -397,8 +375,7 @@ class Common(Model):
         Method for fetching info about possible delivery methods.
 
         :example:
-            ``common = Common()``
-            ``common.get_service_types()``
+            ``Common.get_service_types()``
         :return:
             dictionary with info about possible delivery methods
         :rtype:
@@ -431,8 +408,7 @@ class Common(Model):
         Method for fetching info about ownership forms.
 
         :example:
-            ``common = Common()``
-            ``common.get_ownership_forms_list()``
+            ``Common.get_ownership_forms_list()``
         :return:
             dictionary with info about ownership forms
         :rtype:
@@ -447,8 +423,7 @@ class Common(Model):
         Method for fetching info about backward delivery cargo types.
 
         :example:
-            ``common = Common()``
-            ``common.get_backward_delivery_cargo_types()``
+            ``Common.get_backward_delivery_cargo_types()``
         :return:
             Dictionary with info about backward delivery cargo types.
         :rtype:
@@ -463,8 +438,7 @@ class Common(Model):
         Method for fetching info about pallets for backward delivery.
 
         :example:
-            ``common = Common()``
-            ``common.get_pallets_list()``
+            ``Common.get_pallets_list()``
         :return:
             dictionary with info about pallets
         :rtype:
@@ -479,8 +453,7 @@ class Common(Model):
         Method for fetching info about types of counterparties.
 
         :example:
-            ``common = Common()``
-            ``common.get_type_of_counterparties()``
+            ``Common.get_type_of_counterparties()``
         :return:
             dictionary with info about types of counterparties
         :rtype:
@@ -495,8 +468,7 @@ class Common(Model):
         Method for fetching info about types of payers for redelivery.
 
         :example:
-            ``common = Common()``
-            ``common.get_type_of_payers_for_redelivery()``
+            ``Common.get_type_of_payers_for_redelivery()``
         :return:
             dictionary with info about types of payers for redelivery
         :rtype:
@@ -511,8 +483,7 @@ class Common(Model):
         Method for fetching info about time intervals (for ordering "time intervals" service).
 
         :example:
-        ``common = Common()``
-        ``common.get_time_intervals(city_ref='udb5c896a-391c-11dd-90d9-001a92567626', datetime='2.10.2015')``
+        ``Common.get_time_intervals(city_ref='udb5c896a-391c-11dd-90d9-001a92567626', datetime='2.10.2015')``
         :param city_ref:
             ID of the recipient's city
         :param datetime:
@@ -531,8 +502,7 @@ class Common(Model):
         Method for fetching info about tires and wheels (if cargo is "tires-wheels").
 
         :example:
-            ``common = Common()``
-            ``common.get_tires_wheels_list()``
+            ``Common.get_tires_wheels_list()``
         :return:
             dictionary with info about tires and wheels
         :rtype:
@@ -547,8 +517,7 @@ class Common(Model):
         Method for fetching info about trays (if backward delivery is ordered).
 
         :example:
-            ``common = Common()``
-            ``common.get_trays_list()``
+            ``Common.get_trays_list()``
         :return:
             dictionary with info about trays
         :rtype:
@@ -563,8 +532,7 @@ class Common(Model):
         Method for fetching info about statuses of documents.
 
         :example:
-            ``common = Common()``
-            ``common.get_document_statuses()``
+            ``Common.get_document_statuses()``
         :return:
             dictionary with info about statuses of documents
         :rtype:
