@@ -31,6 +31,9 @@ class TestInternetDocument(unittest.TestCase):
     def test_get_document_list(self):
         self.assertIsInstance(models.InternetDocument.get_document_list(), list)
 
+
+class TestAdditionalService(unittest.TestCase):
+
     def create_recipient(self):
         return models.Counterparty(**{
             "CityRef": "db5c88d7-391c-11dd-90d9-001a92567626",
@@ -72,7 +75,6 @@ class TestInternetDocument(unittest.TestCase):
         return models.InternetDocument(**data).save()
 
 
-class TestAdditionalService(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_return(self):
