@@ -48,24 +48,28 @@ class Model(object):
         )
         result_cls = cls.get_result_cls(method)
 
-        def convert(data):
+        if isinstance(raw, dict):
+            return cls._convert(result_cls, raw)
+        else:
+            return [cls._convert(result_cls, attrs) for attrs in raw]
+
+    @classmethod
+    def get_result_cls(cls, method):
+        return cls.result_cls.get(method, cls)
+
+    @classmethod
+    def _convert(cls, result_cls, data):
+        try:
+            return result_cls(**data)
+        except TypeError:
             try:
-                return result_cls(**data)
-            except TypeError:
                 fields = [f.name for f in attr.fields(result_cls)]
                 return result_cls(**{
                     k: v
                     for k, v in data.items() if k in fields
                 })
-
-        if isinstance(raw, dict):
-            return convert(raw)
-        else:
-            return [convert(attrs) for attrs in raw]
-
-    @classmethod
-    def get_result_cls(cls, method):
-        return cls.result_cls.get(method, cls)
+            except TypeError:
+                return attr.make_class("ApiResponse", list(data.keys()))(**data)
 
 
 class BaseActions(object):
@@ -676,3 +680,7 @@ class AdditionalService(Model):
     @classmethod
     def get_return_orders_list(cls, **kwargs):
         return cls.send(method='getReturnOrdersList', method_props=kwargs)
+
+    @classmethod
+    def delete(cls, ref):
+        return cls.send(method='delete', method_props={"Ref": ref})

@@ -1,5 +1,5 @@
 """
-NOVAPOSHTA_API_KEY = "your test api key"
+export NOVAPOSHTA_API_KEY="your test api key"
 python -m novaposhta.tests
 python -m novaposhta.tests TestInternetDocument.test_get_document_list
 """
@@ -79,18 +79,11 @@ class TestAdditionalService(unittest.TestCase):
 
     @unittest.skipUnless("NOVAPOSHTA_TEST_DOC_NUMBER" in os.environ, "NOVAPOSHTA_TEST_DOC_NUMBER env variable is not set")
     def test_return(self):
-        test_id = os.environ.get("NOVAPOSHTA_TEST_DOC_NUMBER", None)
-        if not test_id:
-            test_id = self.create_test_document().IntDocNumber
-            print(
-                " --> Created test document; You can now do\n"
-                " export NOVAPOSHTA_TEST_DOC_NUMBER='%s'\n"
-                " --> To skip this step." % test_id
-            )
+        test_id = os.environ["NOVAPOSHTA_TEST_DOC_NUMBER"]
         location = models.AdditionalService.check_possibility_create_return(
             test_id,
         )[0]
-        models.ReturnRequest(
+        resp = models.ReturnRequest(
             IntDocNumber=test_id,
             PaymentMethod="Cash",
             Reason="7d07b1de-1d6d-11e4-acce-0050568002cf",
@@ -98,6 +91,7 @@ class TestAdditionalService(unittest.TestCase):
             Note="Тест запроса возврата",
             ReturnAddressRef=location.Ref,
         ).save()
+        models.AdditionalService.delete(resp.Ref)
 
     def test_get_return_reasons(self):
         reasons = models.AdditionalService.get_return_reasons()
