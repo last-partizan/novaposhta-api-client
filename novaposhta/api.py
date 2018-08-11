@@ -108,9 +108,9 @@ def _safe_query_for_logging(**q):
     )
 
 
-def _truncate(string, l=500):
-    if len(string) > 500:
-        return "%s..." % string[:500]
+def _truncate(string, length=500):
+    if len(string) > length:
+        return "%s..." % string[:length]
     return string
 
 
