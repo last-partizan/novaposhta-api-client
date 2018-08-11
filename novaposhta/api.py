@@ -21,6 +21,7 @@ class NovaPoshta(object):
 
     api_key  = attr.ib(default=conf.API_KEY)
     endpoint = attr.ib(default=conf.API_ENDPOINT)
+    timeout  = attr.ib(default=None)
 
     def __getattr__(self, key):
         if key[0].isupper():
@@ -71,7 +72,11 @@ class NovaPoshta(object):
         }
 
         logger.debug("send: %s\n%s", url, _safe_query_for_logging(**query))
-        resp = self.session.post(url, json.dumps(query, default=serializer.encoder))
+        resp = self.session.post(
+            url,
+            json.dumps(query, default=serializer.encoder),
+            timeout=self.timeout,
+        )
         resp.raise_for_status()
         resp = resp.json()
         logger.debug("received:\n%s", _truncate(json.dumps(resp, indent=2, ensure_ascii=False)))
