@@ -10,9 +10,10 @@ class ApiError(Exception):
         self.errors = OrderedDict(zip(ignore_empty(codes), errors))
 
     def __str__(self):
-        return "novaposhta.ApiError:\n%s" % "\n".join(
+        return "\n".join(
             [" * %s: %s" % (k,v) for k,v in self.errors.items()]
         )
+
 
 class AuthError(ApiError):
     message = 'API key is wrong, outdated or not provided'
