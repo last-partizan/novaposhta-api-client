@@ -591,8 +591,8 @@ class SavedDocument(object):
     Ref = attr.ib()
     IntDocNumber = attr.ib()
     TypeDocument = attr.ib()
-    CostOnSite = attr.ib(convert=float)
-    EstimatedDeliveryDate = attr.ib(convert=parse_date_dot)
+    CostOnSite = attr.ib(converter=float)
+    EstimatedDeliveryDate = attr.ib(converter=parse_date_dot)
 
 
 @NovaPoshta.model
