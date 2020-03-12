@@ -61,13 +61,15 @@ class Model(object):
     def _convert(cls, result_cls, data):
         try:
             return result_cls(**data)
-        except TypeError:
+        except TypeError as err:
             try:
                 fields = [f.name for f in attr.fields(result_cls)]
                 return result_cls(**{
                     k: v
                     for k, v in data.items() if k in fields
                 })
+            except attr.exceptions.NotAnAttrsClassError:
+                raise err
             except TypeError:
                 return attr.make_class("ApiResponse", list(data.keys()))(**data)
 
