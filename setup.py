@@ -13,7 +13,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
-    install_requires=['attrs', 'requests'],
+    install_requires=['attrs>=19.2', 'requests'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
