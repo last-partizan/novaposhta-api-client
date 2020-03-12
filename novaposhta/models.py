@@ -610,7 +610,6 @@ class InternetDocument(BaseActions, Model):
         )
 
 
-@attr.s
 @NovaPoshta.model
 class TrackingDocument(Model):
 
