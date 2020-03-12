@@ -2,7 +2,7 @@
 import attr
 
 from .api import NovaPoshta
-from .serializer import parse_date, parse_date_dot, parse_datetime_dot
+from .serializer import parse_datetime_universal, parse_date_dot, parse_datetime_dot
 
 
 class Model(object):
@@ -615,7 +615,7 @@ class TrackingDocument(Model):
 
     convert_attrs = {
         "RecipientDateTime": parse_datetime_dot,
-        "ScheduledDeliveryDate": parse_date,
+        "ScheduledDeliveryDate": parse_datetime_universal,
     }
 
     @classmethod
