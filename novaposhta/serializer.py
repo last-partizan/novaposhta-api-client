@@ -32,6 +32,6 @@ def parse_datetime_universal(v):
         return None
     for fmt in ALL_FORMATS:
         try:
-            return datetime.strptime(v)
+            return datetime.strptime(v, fmt)
         except ValueError:
             pass
