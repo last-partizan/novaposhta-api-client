@@ -6,6 +6,7 @@ setup(
     version='0.2',
     description='Python client for Nova Poshta company\'s API',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     author='semolex, fork by partizan',
     author_email='serg.partizan+novaposhta@gmail.com',
     url='https://github.com/last-partizan/novaposhta-api-client',
