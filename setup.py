@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='novaposhta-api-client',
-    version='0.1',
+    version='0.2',
     description='Python client for Nova Poshta company\'s API',
     long_description=open('README.md').read(),
     author='semolex, fork by partizan',
